@@ -27,7 +27,7 @@ android {
 dependencies {
     compile parent.ext.support_v7
     compile parent.ext.kotlin_jre
-    compile project(path: ':annotations')
+//    compile project(path: ':annotations')
     testCompile 'junit:junit:4.12'
 }
 
