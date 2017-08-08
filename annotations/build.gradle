@@ -1,0 +1,21 @@
+apply plugin: 'kotlin'
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile parent.ext.kotlin_jre
+}
+
+sourceSets {
+    main.java.srcDirs += 'src/main/kotlin'
+}
+
+buildscript {
+
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath parent.ext.kotlin_plugin
+    }
+}
