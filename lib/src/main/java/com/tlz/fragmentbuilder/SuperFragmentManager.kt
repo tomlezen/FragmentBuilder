@@ -69,6 +69,12 @@ class SuperFragmentManager private constructor(val context: Context, fragmentMan
             e.printStackTrace()
         }
 
+        if(editor.revelAnimEditor != null){
+            if(editor.data == null){
+                editor.data = Bundle()
+            }
+            editor.data!!.putParcelable(FbConst.KEY_FB_REVEAL_ANIM_PARAM, editor.revelAnimEditor)
+        }
         val fragment = Fragment.instantiate(context, editor.clazz?.name, editor.data)
         fragment.check()
         transaction?.replace(frameLayoutId, fragment, editor.TAG)
