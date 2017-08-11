@@ -57,11 +57,11 @@ abstract class FbFragment : Fragment() {
     private var isRevealAnimRunning = false
 
     private val onSwipeBackStateListener = object : SwipeBackLayout.OnSwipeBackStateListener {
-        override fun onScollPercent(scrollPercent: Float) {
+        override fun onScrollPercent(scrollPercent: Float) {
         }
 
         override fun doFinish() {
-            onBackPress()
+            back()
         }
     }
 
@@ -155,6 +155,23 @@ abstract class FbFragment : Fragment() {
     open fun onFragmentResult(requestCode: Int, resultCode: Int, data: Bundle?) {}
 
     open fun onBackPress(): Boolean {
+        back()
+        return true
+    }
+
+    fun switch(clazz: Class<out Fragment>, init: FragmentActionEditor.() -> Unit) {
+        supperFragmentManager?.switch(clazz, init)
+    }
+
+    fun add(clazz: Class<out Fragment>, init: FragmentActionEditor.() -> Unit) {
+        supperFragmentManager?.add(clazz, init)
+    }
+
+    fun addForResult(clazz: Class<out Fragment>, requestCode: Int, init: FragmentActionEditor.() -> Unit){
+        supperFragmentManager?.addForResult(clazz, requestCode, init)
+    }
+
+    fun back(){
         if (isAnimCreate && !isRevealAnimRunning && revealAnim != null && supperFragmentManager?.canBack() ?: false) {
             isRevealAnimRunning = true
             SupportViewAnimationUtils.createCircularReveal(
@@ -174,7 +191,6 @@ abstract class FbFragment : Fragment() {
         } else {
             supperFragmentManager?.backForResult(requestCode, resultCode, resultData)
         }
-        return true
     }
 
     protected fun setResult(resultCode: Int, data: Bundle? = null) {

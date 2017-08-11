@@ -152,7 +152,7 @@ class SwipeBackLayout(context: Context, attrs: AttributeSet? = null) : RevealFra
             super.onViewPositionChanged(changedView, left, top, dx, dy)
             if (currentSwipeOrientation and EDGE_LEFT != 0) {
                 scrollPercent = Math.abs(left.toFloat() / (width + shadowLeft.intrinsicWidth))
-                swipeBackStateListener?.onScollPercent(scrollPercent)
+                swipeBackStateListener?.onScrollPercent(scrollPercent)
             }
             invalidate()
             if (scrollPercent > 1) {
@@ -207,7 +207,7 @@ class SwipeBackLayout(context: Context, attrs: AttributeSet? = null) : RevealFra
 
     interface OnSwipeBackStateListener {
         fun doFinish()
-        fun onScollPercent(scrollPercent: Float)
+        fun onScrollPercent(scrollPercent: Float)
     }
 
 }
