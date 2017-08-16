@@ -20,16 +20,22 @@ class SuperFragmentManager private constructor(val context: Context, fragmentMan
 
     private val fragmentManagerWrapper: WeakReference<FragmentManager> = WeakReference(fragmentManager)
 
-    fun switch(clazz: Class<out Fragment>, init: FragmentActionEditor.() -> Unit) {
-        commit(FragmentActionEditor(clazz, FragmentActionType.SWITCH).apply(init))
+    fun switch(clazz: Class<out Fragment>, init: (FragmentActionEditor.() -> Unit)? = null) {
+        commit(FragmentActionEditor(clazz, FragmentActionType.SWITCH).apply{
+            init?.let { this.apply(init) }
+        })
     }
 
-    fun add(clazz: Class<out Fragment>, init: FragmentActionEditor.() -> Unit) {
-        commit(FragmentActionEditor(clazz, FragmentActionType.ADD).apply(init))
+    fun add(clazz: Class<out Fragment>, init: (FragmentActionEditor.() -> Unit)? = null) {
+        commit(FragmentActionEditor(clazz, FragmentActionType.ADD).apply{
+            init?.let { this.apply(init) }
+        })
     }
 
-    fun addForResult(clazz: Class<out Fragment>, requestCode: Int, init: FragmentActionEditor.() -> Unit){
-        commit(FragmentActionEditor(clazz, FragmentActionType.ADD, requestCode).apply(init))
+    fun addForResult(clazz: Class<out Fragment>, requestCode: Int, init: (FragmentActionEditor.() -> Unit)? = null){
+        commit(FragmentActionEditor(clazz, FragmentActionType.ADD, requestCode).apply{
+            init?.let { this.apply(init) }
+        })
     }
 
     fun back() = commit(FragmentActionEditor(null, FragmentActionType.BACK))

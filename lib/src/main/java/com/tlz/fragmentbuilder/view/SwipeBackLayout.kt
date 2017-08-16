@@ -46,7 +46,7 @@ class SwipeBackLayout(context: Context, attrs: AttributeSet? = null) : RevealFra
     private var shadowLeft: Drawable
     private val tmpRect = Rect()
 
-    private var enable = true
+    private var enable = false
     private var currentSwipeOrientation: Int = 0
 
     private var swipeBackStateListener: OnSwipeBackStateListener? = null
@@ -198,10 +198,9 @@ class SwipeBackLayout(context: Context, attrs: AttributeSet? = null) : RevealFra
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        if (!enable || !(fragmentManager?.canBack() ?: false)) {
-            return super.onTouchEvent(event)
+        if (enable && (fragmentManager?.canBack() ?: false)) {
+            helper.processTouchEvent(event)
         }
-        helper.processTouchEvent(event)
         return true
     }
 

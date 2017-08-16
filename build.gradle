@@ -16,7 +16,7 @@ allprojects {
         ext{
             kotlin_version = '1.1.3'
             kotlin_coroutine_version = '0.15'
-            appcompat_verision = '26.0.0-alpha1'
+            appcompat_verision = '26.0.0'
             kotlinpoet_version = '0.4.0-SNAPSHOT'
             auto_service_version = '1.0-rc2'
             auto_common_version = '0.8'

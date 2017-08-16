@@ -8,10 +8,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.tlz.fragmentbuilder.FbToolbarFragment
-import com.tlz.fragmentbuilder.annotation.Args
-import com.tlz.fragmentbuilder.annotation.FragmentCreator
-import kotlinx.android.synthetic.main.fragment_test1.*
-import java.util.*
+import kotlinx.android.synthetic.main.fragment_test1.content
+import kotlinx.android.synthetic.main.fragment_test1.tv_test
+import java.util.Random
 
 /**
  *
@@ -19,7 +18,6 @@ import java.util.*
  * Date: 2017/7/13.
  * Time: 16:46.
  */
-@FragmentCreator
 class TestFragment1 : FbToolbarFragment() {
 
     override fun onCreateViewBefore() {
@@ -29,12 +27,6 @@ class TestFragment1 : FbToolbarFragment() {
         title = "TestFragment${Random().nextInt(100)}"
         fitsSystemWindows = true
     }
-
-    @Args
-    private var test1: Int = 1
-
-    @Args
-    private var test2: Float = 1.0f
 
     override fun onCreateContentView(inflater: LayoutInflater, container: ViewGroup): View {
         return inflater.inflate(R.layout.fragment_test1, container, false)
@@ -51,6 +43,9 @@ class TestFragment1 : FbToolbarFragment() {
         Log.d(TAG, "do onInit")
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+    }
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -60,7 +55,7 @@ class TestFragment1 : FbToolbarFragment() {
                 data = null
                 val rect = Rect()
                 it.getGlobalVisibleRect(rect)
-                revealAnim(rect.centerX(), rect.centerY(), Math.max(rect.width().toFloat(), rect.height().toFloat()), 0f)
+                revealAnim(rect.centerX(), rect.centerY(), Math.max(rect.width().toFloat(), rect.height().toFloat()), (tv_test.parent as ViewGroup).height / 2f)
             })
         }
         setResult(Random().nextInt(10000) + 1)

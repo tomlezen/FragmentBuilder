@@ -51,7 +51,7 @@ class TestFragment2 : FbToolbarFragment() {
                 data = null
                 val rect = Rect()
                 it.getGlobalVisibleRect(rect)
-                revealAnim(rect.centerX(), rect.centerY(), Math.max(rect.width().toFloat(), rect.height().toFloat()), 0f)
+                revealAnim(rect.centerX(), rect.centerY(), Math.max(rect.width().toFloat(), rect.height().toFloat()), (tv_test.parent as ViewGroup).height / 2f)
             })
         }
         setResult(Random().nextInt(10000) + 1)

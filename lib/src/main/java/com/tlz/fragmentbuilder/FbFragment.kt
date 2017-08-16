@@ -76,9 +76,19 @@ abstract class FbFragment : Fragment() {
 
     override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation {
         isAnimCreate = true
+        swipeBackLayout?.setEnableGesture(revealAnim == null)
         if (revealAnim == null) {
             return AnimationUtils.loadAnimation(context, nextAnim)
         } else {
+            if (isAnimCreate && revealAnim != null && contentView != null) {
+                SupportViewAnimationUtils.createCircularReveal(
+                    contentView!!,
+                    if (revealAnim!!.centerX <= 0) contentView!!.width / 2 else revealAnim!!.centerX,
+                    if (revealAnim!!.centerY <= 0) contentView!!.height / 2 else revealAnim!!.centerY,
+                    revealAnim!!.startRadius,
+                    if (revealAnim!!.endRadius <= 0f) Math.max(contentView!!.height - revealAnim!!.centerY, revealAnim!!.centerY).toFloat() else revealAnim!!.endRadius
+                ).start()
+            }
             return AnimationUtils.loadAnimation(context, R.anim.empty)
         }
     }
@@ -88,7 +98,6 @@ abstract class FbFragment : Fragment() {
             onCreateViewBefore()
             swipeBackLayout = SwipeBackLayout(context)
             swipeBackLayout?.setBackgroundColor(Color.TRANSPARENT)
-            swipeBackLayout?.setEnableGesture(revealAnim == null)
             contentView = onCreateView(inflater, container)
         }
         if (contentView != null) {
@@ -108,15 +117,6 @@ abstract class FbFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         if (!isViewCreate) {
             onInit(savedInstanceState)
-        }
-        if (isAnimCreate && revealAnim != null && contentView != null) {
-            SupportViewAnimationUtils.createCircularReveal(
-                    contentView!!,
-                    if (revealAnim!!.centerX <= 0) contentView!!.width / 2 else revealAnim!!.centerX,
-                    if (revealAnim!!.centerY <= 0) contentView!!.height / 2 else revealAnim!!.centerY,
-                    revealAnim!!.startRadius,
-                    if (revealAnim!!.endRadius <= 0f) Math.max(contentView!!.height - revealAnim!!.centerY, revealAnim!!.centerY).toFloat() else revealAnim!!.endRadius
-            ).start()
         }
         isViewCreate = true
     }
