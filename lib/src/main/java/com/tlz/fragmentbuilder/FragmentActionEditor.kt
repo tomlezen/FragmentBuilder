@@ -1,6 +1,7 @@
 package com.tlz.fragmentbuilder
 
 import android.os.Bundle
+import android.support.annotation.AnimRes
 import android.support.v4.app.Fragment
 
 /**
@@ -22,10 +23,8 @@ class FragmentActionEditor internal constructor(
 
     var isClearPrev = false
 
-    var enter = R.anim.slide_in_from_right
-    var exit = R.anim.slide_out_from_right
-    var popEnter = R.anim.slide_in_from_right
-    var popExit = R.anim.slide_out_from_right
+    var enterAnim = R.anim.slide_in_from_right
+    var exitAnim = R.anim.slide_out_from_right
 
     internal var revelAnimEditor: RevealAnimatorEditor? = null
 

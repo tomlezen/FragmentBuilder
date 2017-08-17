@@ -25,7 +25,7 @@ import android.widget.LinearLayout
  */
 abstract class FbToolbarFragment : FbFragment() {
 
-    private var toolbar: Toolbar? = null
+    protected var toolbar: Toolbar? = null
 
     protected var toolbarEnable = true
 
@@ -62,7 +62,7 @@ abstract class FbToolbarFragment : FbFragment() {
     protected var fitsSystemWindows = true
     protected var displayHomeAsUpEnabled = false
         set(value) {
-            setNavigationIcon(R.drawable.ic_fb_back)
+            setNavigationIconRes(R.drawable.ic_fb_back)
             field = value
         }
 
@@ -174,7 +174,7 @@ abstract class FbToolbarFragment : FbFragment() {
         onBackPress()
     }
 
-    protected fun setNavigationIcon(@DrawableRes resId: Int) {
+    protected fun setNavigationIconRes(@DrawableRes resId: Int) {
         navigationIcon = AppCompatResources.getDrawable(context, resId)
     }
 

@@ -7,6 +7,7 @@ import android.support.annotation.IdRes
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
 import android.support.v4.app.FragmentManager
+import com.tlz.fragmentbuilder.FragmentActionType.BACK
 import java.lang.ref.WeakReference
 
 /**
@@ -16,7 +17,7 @@ import java.lang.ref.WeakReference
  * Time: 15:11.
  * manage fragment
  */
-class SuperFragmentManager private constructor(val context: Context, fragmentManager: FragmentManager, @IdRes val frameLayoutId: Int) {
+class SuperFragmentManager private constructor(val context: Context, val TAG: String, fragmentManager: FragmentManager, @IdRes val frameLayoutId: Int) {
 
     private val fragmentManagerWrapper: WeakReference<FragmentManager> = WeakReference(fragmentManager)
 
@@ -48,9 +49,15 @@ class SuperFragmentManager private constructor(val context: Context, fragmentMan
     }
 
     fun commit(editor: FragmentActionEditor): Int {
+        if(editor.action != BACK){
+            if(editor.data == null){
+                editor.data = Bundle()
+            }
+            editor.data!!.putString(FbConst.KEY_FRAGMENT_MANAGER_TAG, TAG)
+        }
         return when (editor.action) {
             FragmentActionType.SWITCH -> {
-                doSwicth(editor)
+                doSwitch(editor)
             }
             FragmentActionType.ADD -> {
                 doAdd(editor)
@@ -62,9 +69,9 @@ class SuperFragmentManager private constructor(val context: Context, fragmentMan
     }
 
     @SuppressLint("RestrictedApi")
-    private fun doSwicth(editor: FragmentActionEditor): Int {
+    private fun doSwitch(editor: FragmentActionEditor): Int {
         val transaction = fragmentManger()?.beginTransaction()
-        transaction?.setCustomAnimations(editor.enter, editor.exit)
+        transaction?.setCustomAnimations(editor.enterAnim, editor.exitAnim)
         try {
             fragmentManger()?.fragments
                     ?.filter { !(it == null || !it.isVisible || it.tag == null || it.tag == editor.TAG) }
@@ -76,9 +83,6 @@ class SuperFragmentManager private constructor(val context: Context, fragmentMan
         }
 
         if(editor.revelAnimEditor != null){
-            if(editor.data == null){
-                editor.data = Bundle()
-            }
             editor.data!!.putParcelable(FbConst.KEY_FB_REVEAL_ANIM_PARAM, editor.revelAnimEditor)
         }
         val fragment = Fragment.instantiate(context, editor.clazz?.name, editor.data)
@@ -97,15 +101,9 @@ class SuperFragmentManager private constructor(val context: Context, fragmentMan
 
     private fun doAdd(editor: FragmentActionEditor): Int {
         if(editor.requestCode != 0){
-            if(editor.data == null){
-                editor.data = Bundle()
-            }
             editor.data!!.putInt(FbConst.KEY_FB_REQUEST_CODE, editor.requestCode)
         }
         if(editor.revelAnimEditor != null){
-            if(editor.data == null){
-                editor.data = Bundle()
-            }
             editor.data!!.putParcelable(FbConst.KEY_FB_REVEAL_ANIM_PARAM, editor.revelAnimEditor)
         }
         val topFragment = topFragment()
@@ -115,7 +113,7 @@ class SuperFragmentManager private constructor(val context: Context, fragmentMan
         if (editor.isClearPrev) {
             fragmentManger()?.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
         }
-        transaction?.setCustomAnimations(editor.enter, editor.exit, editor.popEnter, editor.popExit)
+        transaction?.setCustomAnimations(editor.enterAnim, editor.exitAnim)
         transaction?.add(frameLayoutId, fragment, editor.TAG)
         transaction?.addToBackStack(editor.TAG)
         try {
@@ -184,39 +182,43 @@ class SuperFragmentManager private constructor(val context: Context, fragmentMan
     companion object {
 
         /** SuperFragmentManager collection. */
-        private val mamagerMap = mutableMapOf<Class<out Any>, SuperFragmentManager>()
+        private val mamagerMap = mutableMapOf<String, SuperFragmentManager>()
 
         fun with(activity: FragmentActivity, @IdRes frameLayoutId: Int): SuperFragmentManager {
-            return with(activity, activity.javaClass, activity.supportFragmentManager, frameLayoutId)
+            return with(activity, activity.javaClass.canonicalName, activity.supportFragmentManager, frameLayoutId)
         }
 
         fun with(fragment: Fragment, @IdRes frameLayoutId: Int): SuperFragmentManager {
-            return with(fragment.context, fragment.javaClass, fragment.childFragmentManager, frameLayoutId)
+            return with(fragment.context, fragment.javaClass.canonicalName, fragment.childFragmentManager, frameLayoutId)
         }
 
-        private fun with(context: Context, TAG: Class<Any>, fragmentManager: FragmentManager, @IdRes frameLayoutId: Int): SuperFragmentManager {
+        private fun with(context: Context, TAG: String, fragmentManager: FragmentManager, @IdRes frameLayoutId: Int): SuperFragmentManager {
             var manager = mamagerMap[TAG]
             if (manager == null) {
-                manager = SuperFragmentManager(context.applicationContext, fragmentManager, frameLayoutId)
+                manager = SuperFragmentManager(context.applicationContext, TAG, fragmentManager, frameLayoutId)
                 mamagerMap.put(TAG, manager)
             }
             return manager
         }
 
         fun getManager(fragment: Fragment): SuperFragmentManager? {
-            return mamagerMap[fragment.javaClass]
+            return mamagerMap[fragment.javaClass.canonicalName]
         }
 
         fun getManager(activity: FragmentActivity): SuperFragmentManager? {
-            return mamagerMap[activity.javaClass]
+            return mamagerMap[activity.javaClass.canonicalName]
+        }
+
+        internal fun getManager(TAG: String): SuperFragmentManager? {
+            return mamagerMap[TAG]
         }
 
         fun remove(fragment: Fragment){
-            mamagerMap.remove(fragment.javaClass)
+            mamagerMap.remove(fragment.javaClass.canonicalName)
         }
 
         fun remove(activity: FragmentActivity){
-            mamagerMap.remove(activity.javaClass)
+            mamagerMap.remove(activity.javaClass.canonicalName)
         }
 
     }

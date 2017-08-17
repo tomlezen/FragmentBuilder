@@ -23,9 +23,9 @@ object SupportViewAnimationUtils {
         if(view.parent !is RevealViewGroup){
             throw IllegalArgumentException("parent must be instance of RevealViewGroup")
         }
-//        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-//            return android.view.ViewAnimationUtils.createCircularReveal(view, centerX, centerY, startRadius, endRadius)
-//        }
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            return android.view.ViewAnimationUtils.createCircularReveal(view, centerX, centerY, startRadius, endRadius)
+        }
 
         val viewGroup = view.parent as RevealViewGroup
         val vrm = viewGroup.getViewRevealManager()

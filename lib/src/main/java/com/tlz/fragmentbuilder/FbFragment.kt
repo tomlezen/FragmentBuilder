@@ -6,10 +6,8 @@ import android.graphics.Color
 import android.os.Bundle
 import android.support.annotation.CallSuper
 import android.support.v4.app.Fragment
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewAnimationUtils
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
@@ -33,28 +31,18 @@ abstract class FbFragment : Fragment() {
 
     private var contentView: View? = null
 
-    private var isChild = false
     private var isCreate = false
 
     private var isViewCreate = false
-    private var isAnimCreate = false
     private var isLazyInit = false
 
-    protected val supperFragmentManager: SuperFragmentManager?
-        get() {
-            if (isChild) {
-                return SuperFragmentManager.getManager(this@FbFragment)
-            } else {
-                return SuperFragmentManager.getManager(activity)
-            }
-        }
+    protected lateinit var supperFragmentManager: SuperFragmentManager
 
     private var requestCode = 0
     private var resultCode = RESULT_OK
     private var resultData: Bundle? = null
 
     private var revealAnim: RevealAnimatorEditor? = null
-    private var isRevealAnimRunning = false
 
     private val onSwipeBackStateListener = object : SwipeBackLayout.OnSwipeBackStateListener {
         override fun onScrollPercent(scrollPercent: Float) {
@@ -69,27 +57,50 @@ abstract class FbFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (arguments != null) {
+            supperFragmentManager = SuperFragmentManager.getManager(arguments.getString(FbConst.KEY_FRAGMENT_MANAGER_TAG))!!
             requestCode = arguments.getInt(FbConst.KEY_FB_REQUEST_CODE)
             revealAnim = arguments.getParcelable(FbConst.KEY_FB_REVEAL_ANIM_PARAM)
         }
     }
 
     override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation {
-        isAnimCreate = true
         swipeBackLayout?.setEnableGesture(revealAnim == null)
         if (revealAnim == null) {
             return AnimationUtils.loadAnimation(context, nextAnim)
         } else {
-            if (isAnimCreate && revealAnim != null && contentView != null) {
-                SupportViewAnimationUtils.createCircularReveal(
-                    contentView!!,
-                    if (revealAnim!!.centerX <= 0) contentView!!.width / 2 else revealAnim!!.centerX,
-                    if (revealAnim!!.centerY <= 0) contentView!!.height / 2 else revealAnim!!.centerY,
-                    revealAnim!!.startRadius,
-                    if (revealAnim!!.endRadius <= 0f) Math.max(contentView!!.height - revealAnim!!.centerY, revealAnim!!.centerY).toFloat() else revealAnim!!.endRadius
-                ).start()
+            val defaultAnim = AnimationUtils.loadAnimation(context, R.anim.empty)
+            if (revealAnim != null && contentView != null) {
+                if(enter){
+                    SupportViewAnimationUtils.createCircularReveal(
+                        contentView!!,
+                        if (revealAnim!!.centerX <= 0) contentView!!.width / 2 else revealAnim!!.centerX,
+                        if (revealAnim!!.centerY <= 0) contentView!!.height / 2 else revealAnim!!.centerY,
+                        revealAnim!!.startRadius,
+                        if (revealAnim!!.endRadius <= 0f) Math.max(contentView!!.height - revealAnim!!.centerY, revealAnim!!.centerY).toFloat() else revealAnim!!.endRadius
+                    ).apply {
+                        duration = defaultAnim.duration
+                        start()
+                    }
+                }else{
+                    SupportViewAnimationUtils.createCircularReveal(
+                        contentView!!,
+                        if (revealAnim!!.centerX <= 0) contentView!!.width / 2 else revealAnim!!.centerX,
+                        if (revealAnim!!.centerY <= 0) contentView!!.height / 2 else revealAnim!!.centerY,
+                        if (revealAnim!!.endRadius <= 0f) Math.max(contentView!!.height - revealAnim!!.centerY, revealAnim!!.centerY).toFloat() else revealAnim!!.endRadius,
+                        revealAnim!!.startRadius
+                    ).apply {
+                        addListener(object : AnimatorListenerAdapter(){
+                            override fun onAnimationEnd(animation: Animator?) {
+                                super.onAnimationEnd(animation)
+                                contentView?.visibility = View.GONE
+                            }
+                        })
+                        duration = defaultAnim.duration
+                        start()
+                    }
+                }
             }
-            return AnimationUtils.loadAnimation(context, R.anim.empty)
+            return defaultAnim
         }
     }
 
@@ -160,37 +171,19 @@ abstract class FbFragment : Fragment() {
     }
 
     fun switch(clazz: Class<out Fragment>, init: FragmentActionEditor.() -> Unit) {
-        supperFragmentManager?.switch(clazz, init)
+        supperFragmentManager.switch(clazz, init)
     }
 
     fun add(clazz: Class<out Fragment>, init: FragmentActionEditor.() -> Unit) {
-        supperFragmentManager?.add(clazz, init)
+        supperFragmentManager.add(clazz, init)
     }
 
     fun addForResult(clazz: Class<out Fragment>, requestCode: Int, init: FragmentActionEditor.() -> Unit){
-        supperFragmentManager?.addForResult(clazz, requestCode, init)
+        supperFragmentManager.addForResult(clazz, requestCode, init)
     }
 
     fun back(){
-        if (isAnimCreate && !isRevealAnimRunning && revealAnim != null && supperFragmentManager?.canBack() ?: false) {
-            isRevealAnimRunning = true
-            SupportViewAnimationUtils.createCircularReveal(
-                    contentView!!,
-                    if (revealAnim!!.centerX <= 0) contentView!!.width / 2 else revealAnim!!.centerX,
-                    if (revealAnim!!.centerY <= 0) contentView!!.height / 2 else revealAnim!!.centerY,
-                    if (revealAnim!!.endRadius <= 0f) Math.max(contentView!!.height - revealAnim!!.centerY, revealAnim!!.centerY).toFloat() else revealAnim!!.endRadius,
-                    revealAnim!!.startRadius
-            ).apply {
-                addListener(object : AnimatorListenerAdapter() {
-                    override fun onAnimationEnd(animation: Animator?) {
-                        super.onAnimationEnd(animation)
-                        supperFragmentManager?.backForResult(requestCode, resultCode, resultData)
-                    }
-                })
-            }.start()
-        } else {
-            supperFragmentManager?.backForResult(requestCode, resultCode, resultData)
-        }
+        supperFragmentManager.backForResult(requestCode, resultCode, resultData)
     }
 
     protected fun setResult(resultCode: Int, data: Bundle? = null) {
