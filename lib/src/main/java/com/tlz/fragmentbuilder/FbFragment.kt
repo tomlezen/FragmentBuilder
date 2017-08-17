@@ -166,15 +166,18 @@ abstract class FbFragment : Fragment() {
     open fun onFragmentResult(requestCode: Int, resultCode: Int, data: Bundle?) {}
 
     open fun onBackPress(): Boolean {
-        back()
-        return true
+        if(supperFragmentManager.canBack()){
+            back()
+            return true
+        }
+        return false
     }
 
-    fun switch(clazz: Class<out Fragment>, init: FragmentActionEditor.() -> Unit) {
+    fun switch(clazz: Class<out Fragment>, init: (FragmentActionEditor.() -> Unit)? = null) {
         supperFragmentManager.switch(clazz, init)
     }
 
-    fun add(clazz: Class<out Fragment>, init: FragmentActionEditor.() -> Unit) {
+    fun add(clazz: Class<out Fragment>, init: (FragmentActionEditor.() -> Unit)? = null) {
         supperFragmentManager.add(clazz, init)
     }
 

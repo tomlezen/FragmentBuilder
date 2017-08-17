@@ -143,7 +143,7 @@ class SuperFragmentManager private constructor(val context: Context, val TAG: St
 
     fun canBack(): Boolean{
         try {
-            return fragmentManger()?.backStackEntryCount ?: 0 > 0
+            return (fragmentManger()?.backStackEntryCount ?: 0) > 0
         }catch (e: Exception){
 
         }
@@ -167,8 +167,7 @@ class SuperFragmentManager private constructor(val context: Context, val TAG: St
 
     fun onBackPress(): Boolean {
         try {
-            val topFragment = topFragment()?.check()
-            return canBack() && topFragment?.onBackPress() ?: false
+            return topFragment()?.check()?.onBackPress() ?: false
         }catch (e: Exception){
 
         }
