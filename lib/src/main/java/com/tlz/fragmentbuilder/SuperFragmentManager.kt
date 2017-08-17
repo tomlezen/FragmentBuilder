@@ -113,7 +113,7 @@ class SuperFragmentManager private constructor(val context: Context, val TAG: St
         if (editor.isClearPrev) {
             fragmentManger()?.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
         }
-        transaction?.setCustomAnimations(editor.enterAnim, editor.exitAnim)
+        transaction?.setCustomAnimations(editor.enterAnim, editor.exitAnim, editor.enterAnim, editor.exitAnim)
         transaction?.add(frameLayoutId, fragment, editor.TAG)
         transaction?.addToBackStack(editor.TAG)
         try {
@@ -136,7 +136,7 @@ class SuperFragmentManager private constructor(val context: Context, val TAG: St
                 return 0
             }
         } catch (e: Exception) {
-
+            e.printStackTrace()
         }
         return -1
     }
@@ -145,7 +145,7 @@ class SuperFragmentManager private constructor(val context: Context, val TAG: St
         try {
             return (fragmentManger()?.backStackEntryCount ?: 0) > 0
         }catch (e: Exception){
-
+            e.printStackTrace()
         }
         return false
     }

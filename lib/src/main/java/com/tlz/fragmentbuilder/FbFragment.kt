@@ -181,7 +181,7 @@ abstract class FbFragment : Fragment() {
         supperFragmentManager.add(clazz, init)
     }
 
-    fun addForResult(clazz: Class<out Fragment>, requestCode: Int, init: FragmentActionEditor.() -> Unit){
+    fun addForResult(clazz: Class<out Fragment>, requestCode: Int, init: (FragmentActionEditor.() -> Unit)? = null){
         supperFragmentManager.addForResult(clazz, requestCode, init)
     }
 
