@@ -3,9 +3,11 @@ package com.tlz.fragmentbuilder
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.graphics.Color
+import android.graphics.Rect
 import android.os.Bundle
 import android.support.annotation.CallSuper
 import android.support.v4.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -28,6 +30,11 @@ abstract class FbFragment : Fragment() {
     }
 
     private var swipeBackLayout: SwipeBackLayout? = null
+    protected var swipeBackEnable = true
+        set(value) {
+            field = value
+            swipeBackLayout?.setEnableGesture(value)
+        }
 
     private var contentView: View? = null
 
@@ -64,7 +71,9 @@ abstract class FbFragment : Fragment() {
     }
 
     override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation {
-        swipeBackLayout?.setEnableGesture(revealAnim == null)
+        if(revealAnim != null){
+            swipeBackEnable = false
+        }
         if (revealAnim == null) {
             return AnimationUtils.loadAnimation(context, nextAnim)
         } else {
@@ -108,6 +117,7 @@ abstract class FbFragment : Fragment() {
         if (contentView == null && inflater != null && container != null) {
             onCreateViewBefore()
             swipeBackLayout = SwipeBackLayout(context)
+            swipeBackEnable = true
             swipeBackLayout?.setBackgroundColor(Color.TRANSPARENT)
             contentView = onCreateView(inflater, container)
         }

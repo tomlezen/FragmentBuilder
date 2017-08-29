@@ -200,8 +200,9 @@ class SwipeBackLayout(context: Context, attrs: AttributeSet? = null) : RevealFra
     override fun onTouchEvent(event: MotionEvent): Boolean {
         if (enable && (fragmentManager?.canBack() ?: false)) {
             helper.processTouchEvent(event)
+            return true
         }
-        return true
+        return false
     }
 
     interface OnSwipeBackStateListener {

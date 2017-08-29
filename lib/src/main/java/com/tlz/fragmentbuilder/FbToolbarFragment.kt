@@ -91,7 +91,7 @@ abstract class FbToolbarFragment : FbFragment() {
     @CallSuper
     override fun onLazyInit() {
         if (toolbarEnable) {
-            onCreateOptionsMenu(toolbar!!.menu, activity.menuInflater)
+            invalidateOptionsMenu()
         }
     }
 
@@ -176,6 +176,11 @@ abstract class FbToolbarFragment : FbFragment() {
 
     protected fun setNavigationIconRes(@DrawableRes resId: Int) {
         navigationIcon = AppCompatResources.getDrawable(context, resId)
+    }
+
+    protected fun invalidateOptionsMenu(){
+        toolbar?.menu?.clear()
+        onCreateOptionsMenu(toolbar!!.menu, activity.menuInflater)
     }
 
     abstract protected fun onCreateContentView(inflater: LayoutInflater, container: ViewGroup): View

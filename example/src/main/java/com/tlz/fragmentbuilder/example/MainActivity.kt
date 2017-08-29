@@ -2,6 +2,7 @@ package com.tlz.fragmentbuilder.example
 
 import android.os.Bundle
 import com.tlz.fragmentbuilder.FbCompatActivity
+import kotlinx.android.synthetic.main.activity_main.content
 
 class MainActivity : FbCompatActivity() {
 

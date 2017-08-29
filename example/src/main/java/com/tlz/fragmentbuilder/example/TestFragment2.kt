@@ -7,6 +7,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import com.tlz.fragmentbuilder.FbToolbarFragment
 import kotlinx.android.synthetic.main.fragment_test1.*
 import java.util.*
@@ -18,6 +20,10 @@ import java.util.*
  * Time: 16:46.
  */
 class TestFragment2 : FbToolbarFragment() {
+
+    override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation {
+        return AnimationUtils.loadAnimation(context, R.anim.empty)
+    }
 
     override fun onCreateViewBefore() {
         toolbarEnable = true
