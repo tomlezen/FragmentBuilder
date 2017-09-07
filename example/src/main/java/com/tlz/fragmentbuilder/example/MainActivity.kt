@@ -2,12 +2,11 @@ package com.tlz.fragmentbuilder.example
 
 import android.os.Bundle
 import com.tlz.fragmentbuilder.FbCompatActivity
-import kotlinx.android.synthetic.main.activity_main.content
 
 class MainActivity : FbCompatActivity() {
 
     override fun frameLayoutId(): Int {
-        return R.id.content
+        return R.id.main_content
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

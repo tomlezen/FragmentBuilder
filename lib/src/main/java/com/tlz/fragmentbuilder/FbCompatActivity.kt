@@ -11,29 +11,29 @@ import android.support.v7.app.AppCompatActivity
  * Date: 2017/7/25.
  * Time: 16:48.
  */
-abstract class FbCompatActivity: AppCompatActivity() {
+abstract class FbCompatActivity : AppCompatActivity() {
 
-    @CallSuper
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+  protected lateinit var  superFragmentManager: FbFragmentManager
+
+  @CallSuper
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    superFragmentManager = FbFragmentManager.with(this, frameLayoutId())
+  }
+
+  override fun onBackPressed() {
+    if (!superFragmentManager.onBackPress()) {
+      super.onBackPressed()
     }
+  }
 
-    override fun onBackPressed() {
-        if(!superFragmentManager.onBackPress()){
-            super.onBackPressed()
-        }
-    }
+  override fun onDestroy() {
+    super.onDestroy()
+    FbFragmentManager.remove(this)
+  }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        SuperFragmentManager.remove(this)
-    }
-
-    protected val superFragmentManager: SuperFragmentManager by lazy  {
-        SuperFragmentManager.with(this, frameLayoutId())
-    }
-
-    protected abstract  @IdRes fun frameLayoutId(): Int
+  protected abstract @IdRes
+  fun frameLayoutId(): Int
 
 
 }

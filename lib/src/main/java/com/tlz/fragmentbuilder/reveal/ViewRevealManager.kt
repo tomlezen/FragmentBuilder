@@ -48,12 +48,12 @@ class ViewRevealManager {
         return revealData?.applyTransformation(canvas, child) ?: false
     }
 
-    class RevealValues(var target: View, var centerX: Int, var centerY: Int, var startRadius: Float, var endRadius: Float){
+    class RevealValues(var target: View, private var centerX: Int, private var centerY: Int, var startRadius: Float, var endRadius: Float){
 
         var isClipping = false
 
-        var path = Path()
-        var op = Region.Op.REPLACE
+        private var path = Path()
+        private var op = Region.Op.REPLACE
         var radius = 0f
 
         fun applyTransformation(canvas: Canvas, child: View): Boolean{
@@ -84,9 +84,9 @@ class ViewRevealManager {
 
     }
 
-    class ChangeViewLayerTypeAdapter(val viewData: RevealValues, val layerType: Int): AnimatorListenerAdapter() {
+    class ChangeViewLayerTypeAdapter(private val viewData: RevealValues, private val layerType: Int): AnimatorListenerAdapter() {
 
-        val originalLayerType = viewData.target.layerType
+        private val originalLayerType = viewData.target.layerType
 
         override fun onAnimationStart(animation: Animator?) {
             viewData.target.setLayerType(layerType, null)

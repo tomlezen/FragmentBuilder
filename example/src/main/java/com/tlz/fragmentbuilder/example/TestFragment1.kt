@@ -7,9 +7,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.tlz.fragmentbuilder.FbFragmentManager
 import com.tlz.fragmentbuilder.FbToolbarFragment
-import com.tlz.fragmentbuilder.SuperFragmentManager
-import kotlinx.android.synthetic.main.fragment_test1.content
+import kotlinx.android.synthetic.main.fragment_test1.content1
 import kotlinx.android.synthetic.main.fragment_test1.tv_test
 import java.util.Random
 
@@ -42,7 +42,7 @@ class TestFragment1 : FbToolbarFragment() {
 
     override fun onInit(savedInstanceState: Bundle?) {
         Log.d(TAG, "do onInit")
-        SuperFragmentManager.with(this, R.id.content).switch(TestFragment2::class.java)
+//        FbFragmentManager.with(this, R.id.content).switch(TestFragment2::class.java)
     }
 
     override fun onDestroy() {
@@ -51,16 +51,15 @@ class TestFragment1 : FbToolbarFragment() {
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-//        content.setBackgroundColor(Color.rgb(Random().nextInt(255), Random().nextInt(255), Random().nextInt(255)))
-//        tv_test.setOnClickListener {
-//            supperFragmentManager.addForResult(if(Random().nextInt(10) % 2 == 1) TestFragment1::class.java else TestFragment2::class.java, 12312, {
-//                data = null
-//                val rect = Rect()
-//                it.getGlobalVisibleRect(rect)
-////                revealAnim(rect.centerX(), rect.centerY(), Math.max(rect.width().toFloat(), rect.height().toFloat()), (tv_test.parent as ViewGroup).height / 2f)
-//            })
-//        }
-//        setResult(Random().nextInt(10000) + 1)
+        content1.setBackgroundColor(Color.rgb(Random().nextInt(255), Random().nextInt(255), Random().nextInt(255)))
+        tv_test.setOnClickListener {
+            fbFragmentManager.addForResult(if(Random().nextInt(10) % 2 == 1) TestFragment1::class.java else TestFragment2::class.java, 12312, {
+                val rect = Rect()
+                it.getGlobalVisibleRect(rect)
+//                revealAnim(rect.centerX(), rect.centerY(), Math.max(rect.width().toFloat(), rect.height().toFloat()), (tv_test.parent as ViewGroup).height / 2f)
+            })
+        }
+        setResult(Random().nextInt(10000) + 1)
     }
 
     override fun onFragmentResult(requestCode: Int, resultCode: Int, data: Bundle?) {

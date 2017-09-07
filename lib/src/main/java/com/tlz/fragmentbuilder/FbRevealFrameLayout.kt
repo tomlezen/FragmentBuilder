@@ -1,4 +1,4 @@
-package com.tlz.fragmentbuilder.view
+package com.tlz.fragmentbuilder
 
 import android.content.Context
 import android.graphics.Canvas
@@ -15,7 +15,7 @@ import com.tlz.fragmentbuilder.reveal.ViewRevealManager
  * Date: 2017/8/2.
  * Time: 9:54.
  */
-open class RevealFrameLayout : FrameLayout, RevealViewGroup {
+open class FbRevealFrameLayout : FrameLayout, RevealViewGroup {
 
     private val rvm: ViewRevealManager by lazy { ViewRevealManager() }
 

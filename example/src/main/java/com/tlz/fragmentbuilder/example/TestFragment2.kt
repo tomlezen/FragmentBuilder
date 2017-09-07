@@ -21,10 +21,6 @@ import java.util.*
  */
 class TestFragment2 : FbToolbarFragment() {
 
-    override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation {
-        return AnimationUtils.loadAnimation(context, R.anim.empty)
-    }
-
     override fun onCreateViewBefore() {
         toolbarEnable = true
         displayHomeAsUpEnabled = true
@@ -52,10 +48,10 @@ class TestFragment2 : FbToolbarFragment() {
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        content.setBackgroundColor(Color.rgb(Random().nextInt(255), Random().nextInt(255), Random().nextInt(255)))
+        content1.setBackgroundColor(Color.rgb(Random().nextInt(255), Random().nextInt(255), Random().nextInt(255)))
         tv_test.setOnClickListener {
-            supperFragmentManager.addForResult(if(Random().nextInt(10) % 2 == 1) TestFragment1::class.java else TestFragment2::class.java, 12312, {
-                data = null
+            fbFragmentManager.addForResult(if(Random().nextInt(10) % 2 == 1) TestFragment1::class.java else TestFragment2::class.java, 12312, {
+//                data = null
                 val rect = Rect()
                 it.getGlobalVisibleRect(rect)
 //                revealAnim(rect.centerX(), rect.centerY(), Math.max(rect.width().toFloat(), rect.height().toFloat()), (tv_test.parent as ViewGroup).height / 2f)
