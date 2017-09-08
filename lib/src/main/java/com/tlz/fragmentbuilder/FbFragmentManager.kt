@@ -7,7 +7,6 @@ import android.support.annotation.IdRes
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
 import android.support.v4.app.FragmentManager
-import android.support.v4.app.FragmentTransaction
 import com.tlz.fragmentbuilder.FragmentActionType.BACK
 import java.lang.ref.WeakReference
 
@@ -21,8 +20,10 @@ import java.lang.ref.WeakReference
 class FbFragmentManager private constructor(private val context: Context, private val TAG: String,
     fragmentManager: FragmentManager, @IdRes private val frameLayoutId: Int) {
 
-  private val fragmentManagerWrapper: WeakReference<FragmentManager> = WeakReference(
-      fragmentManager)
+  private val fragmentManagerWrapper: WeakReference<FragmentManager> = WeakReference(fragmentManager)
+
+  var enter = R.anim.slide_in_from_right
+  var exit = R.anim.slide_out_from_right
 
   fun switch(clazz: Class<out Fragment>, init: (FragmentActionEditor.() -> Unit)? = null) {
     commit(FragmentActionEditor(clazz, FragmentActionType.SWITCH).apply {
@@ -73,41 +74,36 @@ class FbFragmentManager private constructor(private val context: Context, privat
 
   @SuppressLint("RestrictedApi")
   private fun doSwitch(editor: FragmentActionEditor): Int {
-    val transaction = fragmentManger()?.beginTransaction()
-    transaction?.setCustomAnimations(editor.enterAnim, editor.exitAnim)
-    try {
-      fragmentManger()?.fragments
-          ?.filter { !(it == null || !it.isVisible || it.tag == null || it.tag == editor.TAG) }
-          ?.forEach {
-            transaction?.remove(it)
-          }
-    } catch (e: Exception) {
-      e.printStackTrace()
-    }
+    return fragmentManger()?.beginTransaction()?.let {
+      it.setCustomAnimations(enter, exit)
+      try {
+        fragmentManger()?.fragments
+            ?.filter { !(it == null || !it.isVisible || it.tag == null || it.tag == editor.TAG) }
+            ?.forEach { value ->
+              it.remove(value)
+            }
+      } catch (e: Exception) {
+        e.printStackTrace()
+      }
 
-    editor.revelAnimEditor?.let {
-      editor.data.putParcelable(FbConst.KEY_FB_REVEAL_ANIM_PARAM, it)
-    }
-    val fragment = Fragment.instantiate(context, editor.clazz?.name, editor.data)
-    fragment.check()
-    transaction?.replace(frameLayoutId, fragment, editor.TAG)
+      val fragment = Fragment.instantiate(context, editor.clazz?.name, editor.data)
+      fragment.check()
+      it.replace(frameLayoutId, fragment, editor.TAG)
 
-    val id = transaction?.commitAllowingStateLoss() ?: -1
-    try {
-      fragment.userVisibleHint = true
-      fragmentManger()?.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
-    } catch (e: Exception) {
-      e.printStackTrace()
-    }
-    return id
+      val id = it.commitAllowingStateLoss()
+      try {
+        fragment.userVisibleHint = true
+        fragmentManger()?.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+      } catch (e: Exception) {
+        e.printStackTrace()
+      }
+      id
+    } ?: 0
   }
 
   private fun doAdd(editor: FragmentActionEditor): Int {
     if (editor.requestCode != 0) {
       editor.data.putInt(FbConst.KEY_FB_REQUEST_CODE, editor.requestCode)
-    }
-    editor.revelAnimEditor?.let {
-      editor.data.putParcelable(FbConst.KEY_FB_REVEAL_ANIM_PARAM, it)
     }
     val topFragment = topFragment()
     val fragment = Fragment.instantiate(context, editor.clazz?.name, editor.data)
@@ -116,7 +112,7 @@ class FbFragmentManager private constructor(private val context: Context, privat
       if (editor.isClearPrev) {
         fragmentManger()?.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
       }
-//      it.setCustomAnimations(editor.enterAnim, editor.exitAnim, editor.enterAnim, editor.exitAnim)
+      it.setCustomAnimations(enter, exit)
       it.add(frameLayoutId, fragment, editor.TAG)
       it.addToBackStack(editor.TAG)
       fragment?.userVisibleHint = true

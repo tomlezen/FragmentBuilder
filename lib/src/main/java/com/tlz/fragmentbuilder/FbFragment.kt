@@ -1,6 +1,7 @@
 package com.tlz.fragmentbuilder
 
-import android.graphics.Color
+import android.animation.Animator
+import android.animation.AnimatorInflater
 import android.os.Bundle
 import android.support.annotation.CallSuper
 import android.support.v4.app.Fragment
@@ -8,10 +9,13 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import com.tlz.fragmentbuilder.FbFrameLayout.OnSwipeBackStateListener
+import com.tlz.fragmentbuilder.animation.FbAnimationSet
 import com.transitionseverywhere.Slide
+import com.transitionseverywhere.Transition
 import com.transitionseverywhere.TransitionManager
-import com.transitionseverywhere.extra.Scale
 
 
 /**
@@ -29,12 +33,15 @@ abstract class FbFragment : Fragment(), OnSwipeBackStateListener {
   internal var swipeBackEnable = true
 
   protected var rootView: ViewGroup? = null
+    private set(value) { field = value }
   private var contentView: View? = null
 
   private var isCreate = false
-
   private var isViewCreate = false
   private var isLazyInit = false
+  private var isSwipeFinish = false
+  private var isEnterTransition = false
+  private var isExitTransition = false
 
   lateinit var fbFragmentManager: FbFragmentManager
 
@@ -42,73 +49,59 @@ abstract class FbFragment : Fragment(), OnSwipeBackStateListener {
   private var resultCode = RESULT_OK
   private var resultData: Bundle? = null
 
-  private var revealAnim: RevealAnimatorEditor? = null
-
-  private val onSwipeBackStateListener = object : FbFrameLayout.OnSwipeBackStateListener {
-    override fun onScrollPercent(scrollPercent: Float) {
-    }
-  }
-
   @CallSuper
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     if (arguments != null) {
-      fbFragmentManager = FbFragmentManager.getManager(arguments.getString(FbConst.KEY_FRAGMENT_MANAGER_TAG))!!
       requestCode = arguments.getInt(FbConst.KEY_FB_REQUEST_CODE)
-      revealAnim = arguments.getParcelable(FbConst.KEY_FB_REVEAL_ANIM_PARAM)
     }
   }
 
-//  override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation {
-//    if (revealAnim != null) {
-//      swipeBackEnable = false
-//    }
-//    if (revealAnim == null) {
-//      return AnimationUtils.loadAnimation(context, nextAnim)
-//    } else {
-//      val defaultAnim = AnimationUtils.loadAnimation(context, R.anim.empty)
-//      if (revealAnim != null && contentView != null) {
-//        if (enter) {
-//          SupportViewAnimationUtils.createCircularReveal(
-//              contentView!!,
-//              if (revealAnim!!.centerX <= 0) contentView!!.width / 2 else revealAnim!!.centerX,
-//              if (revealAnim!!.centerY <= 0) contentView!!.height / 2 else revealAnim!!.centerY,
-//              revealAnim!!.startRadius,
-//              if (revealAnim!!.endRadius <= 0f) Math.max(
-//                  contentView!!.height - revealAnim!!.centerY,
-//                  revealAnim!!.centerY).toFloat() else revealAnim!!.endRadius
-//          ).apply {
-//            duration = defaultAnim.duration
-//            start()
-//          }
-//        } else {
-//          SupportViewAnimationUtils.createCircularReveal(
-//              contentView!!,
-//              if (revealAnim!!.centerX <= 0) contentView!!.width / 2 else revealAnim!!.centerX,
-//              if (revealAnim!!.centerY <= 0) contentView!!.height / 2 else revealAnim!!.centerY,
-//              if (revealAnim!!.endRadius <= 0f) Math.max(
-//                  contentView!!.height - revealAnim!!.centerY,
-//                  revealAnim!!.centerY).toFloat() else revealAnim!!.endRadius,
-//              revealAnim!!.startRadius
-//          ).apply {
-//            addListener(object : AnimatorListenerAdapter() {
-//              override fun onAnimationEnd(animation: Animator?) {
-//                super.onAnimationEnd(animation)
-//                contentView?.visibility = View.GONE
-//              }
-//            })
-//            duration = defaultAnim.duration
-//            start()
-//          }
-//        }
+  override final fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation? {
+    val animation =  onCreateFbAnimation(transit, enter, nextAnim)
+
+    return animation?.let {
+      val fbas = FbAnimationSet(true).add(it).endWithAction { onAnimFinish(enter) }
+      if(!enter){
+        onCreateTransition(false)?.let { TransitionManager.beginDelayedTransition(rootView, it.startWithAction { isExitTransition = true }.endWithAction { fbas.notificationAnimationEnd() }) } ?: back()
+        contentView?.visibility = View.GONE
+      }
+      fbas
+    } ?: super.onCreateAnimation(transit, enter, nextAnim)
+  }
+
+  open protected fun onCreateFbAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation? {
+//    if((enter && isEnterTransition) || (!enter && isExitTransition)){
+      return AnimationUtils.loadAnimation(context, R.anim.empty)
+//    }else{
+//      if(nextAnim != 0){
+//        try {
+//          return AnimationUtils.loadAnimation(context, nextAnim)
+//        }catch (e: Exception){ }
 //      }
-//      return defaultAnim
 //    }
-//  }
+//    return super.onCreateAnimation(transit, enter, nextAnim)
+  }
+
+  override final fun onCreateAnimator(transit: Int, enter: Boolean, nextAnim: Int): Animator? {
+    val animator = onCreateFbAnimator(transit, enter, nextAnim)
+    return animator?.let { it.endWithAction { onAnimFinish(enter) } } ?: super.onCreateAnimator(transit, enter, nextAnim)
+  }
+
+  open protected fun onCreateFbAnimator(transit: Int, enter: Boolean, nextAnim: Int): Animator? {
+    if(nextAnim != 0){
+      try {
+        return AnimatorInflater.loadAnimator(context, nextAnim)
+      }catch (e: Exception){}
+    }
+    return super.onCreateAnimator(transit, enter, nextAnim)
+  }
 
   override final fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    onCreateTransition(true)?.let { TransitionManager.beginDelayedTransition(container, it.startWithAction { isEnterTransition = true }.endWithAction { onAnimFinish(true) }) }
     rootView = container
     if (contentView == null && inflater != null && container != null) {
+      fbFragmentManager = FbFragmentManager.getManager(arguments.getString(FbConst.KEY_FRAGMENT_MANAGER_TAG))!!
       onCreateViewBefore()
       contentView = onCreateView(inflater, container)
     }
@@ -168,6 +161,10 @@ abstract class FbFragment : Fragment(), OnSwipeBackStateListener {
     }
   }
 
+  open protected fun onCreateTransition(enter: Boolean): Transition?{
+    return Slide(Gravity.END)
+  }
+
   private fun prepareLazyInit() {
     onLazyInit()
     isCreate = false
@@ -175,6 +172,9 @@ abstract class FbFragment : Fragment(), OnSwipeBackStateListener {
   }
 
   open protected fun onCreateViewBefore() {}
+
+  open protected fun onAnimFinish(enter: Boolean){
+  }
 
   open fun onFragmentResult(requestCode: Int, resultCode: Int, data: Bundle?) {}
 
@@ -203,7 +203,18 @@ abstract class FbFragment : Fragment(), OnSwipeBackStateListener {
   }
 
   fun back() {
-    fbFragmentManager.backForResult(requestCode, resultCode, resultData)
+//    if(!isSwipeFinish){
+//      isSwipeFinish = true
+//      onCreateTransition(false)?.let { TransitionManager.beginDelayedTransition(rootView, it.startWithAction { isExitTransition = true }) } ?: back()
+//      contentView?.visibility = View.GONE
+//    }else{
+      fbFragmentManager.backForResult(requestCode, resultCode, resultData)
+//    }
+  }
+
+  internal fun backForSwipe(){
+    isSwipeFinish = true
+    back()
   }
 
   protected fun setResult(resultCode: Int, data: Bundle? = null) {

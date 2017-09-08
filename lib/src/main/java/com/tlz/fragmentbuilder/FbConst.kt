@@ -12,6 +12,4 @@ object FbConst {
 
     const val KEY_FB_REQUEST_CODE = "key_fb_request_code"
 
-    const val KEY_FB_REVEAL_ANIM_PARAM = "key_fb_reveal_anim_param"
-
 }

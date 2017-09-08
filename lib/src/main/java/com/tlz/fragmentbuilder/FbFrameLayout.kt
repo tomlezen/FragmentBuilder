@@ -157,7 +157,7 @@ class FbFrameLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
       }
       invalidate()
       if (scrollPercent > 1) {
-        fbFragment?.back()
+        fbFragment?.backForSwipe()
       }
     }
 
@@ -211,9 +211,9 @@ class FbFrameLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
   }
 
   internal fun unBind(fbFragment: FbFragment){
-//    if(this.fbFragment == fbFragment){
-//      this.fbFragment = null
-//    }
+    if(this.fbFragment == fbFragment){
+      this.fbFragment = null
+    }
   }
 
   interface OnSwipeBackStateListener {

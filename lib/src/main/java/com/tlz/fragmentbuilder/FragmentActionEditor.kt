@@ -2,10 +2,8 @@ package com.tlz.fragmentbuilder
 
 import android.os.Bundle
 import android.os.Parcelable
-import android.support.annotation.AnimRes
 import android.support.v4.app.Fragment
 import java.io.Serializable
-import java.util.ArrayList
 
 /**
  *
@@ -58,14 +56,5 @@ class FragmentActionEditor internal constructor(
   }
 
   var isClearPrev = false
-
-  var enterAnim = R.anim.slide_in_from_right
-  var exitAnim = R.anim.slide_out_from_right
-
-  internal var revelAnimEditor: RevealAnimatorEditor? = null
-
-  fun revealAnim(centerX: Int, centerY: Int, startRadius: Float, endRadius: Float) {
-    revelAnimEditor = RevealAnimatorEditor(centerX, centerY, startRadius, endRadius)
-  }
 
 }

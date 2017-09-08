@@ -58,9 +58,57 @@ class TestFragment1 : FbToolbarFragment() {
                 it.getGlobalVisibleRect(rect)
 //                revealAnim(rect.centerX(), rect.centerY(), Math.max(rect.width().toFloat(), rect.height().toFloat()), (tv_test.parent as ViewGroup).height / 2f)
             })
+//          fbFragmentManager.switch(TestFragment1::class.java)
         }
         setResult(Random().nextInt(10000) + 1)
     }
+
+  //  override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation {
+//    if (revealAnim != null) {
+//      swipeBackEnable = false
+//    }
+//    if (revealAnim == null) {
+//      return AnimationUtils.loadAnimation(context, nextAnim)
+//    } else {
+//      val defaultAnim = AnimationUtils.loadAnimation(context, R.anim.empty)
+//      if (revealAnim != null && contentView != null) {
+//        if (enter) {
+//          SupportViewAnimationUtils.createCircularReveal(
+//              contentView!!,
+//              if (revealAnim!!.centerX <= 0) contentView!!.width / 2 else revealAnim!!.centerX,
+//              if (revealAnim!!.centerY <= 0) contentView!!.height / 2 else revealAnim!!.centerY,
+//              revealAnim!!.startRadius,
+//              if (revealAnim!!.endRadius <= 0f) Math.max(
+//                  contentView!!.height - revealAnim!!.centerY,
+//                  revealAnim!!.centerY).toFloat() else revealAnim!!.endRadius
+//          ).apply {
+//            duration = defaultAnim.duration
+//            start()
+//          }
+//        } else {
+//          SupportViewAnimationUtils.createCircularReveal(
+//              contentView!!,
+//              if (revealAnim!!.centerX <= 0) contentView!!.width / 2 else revealAnim!!.centerX,
+//              if (revealAnim!!.centerY <= 0) contentView!!.height / 2 else revealAnim!!.centerY,
+//              if (revealAnim!!.endRadius <= 0f) Math.max(
+//                  contentView!!.height - revealAnim!!.centerY,
+//                  revealAnim!!.centerY).toFloat() else revealAnim!!.endRadius,
+//              revealAnim!!.startRadius
+//          ).apply {
+//            addListener(object : AnimatorListenerAdapter() {
+//              override fun onAnimationEnd(animation: Animator?) {
+//                super.onAnimationEnd(animation)
+//                contentView?.visibility = View.GONE
+//              }
+//            })
+//            duration = defaultAnim.duration
+//            start()
+//          }
+//        }
+//      }
+//      return defaultAnim
+//    }
+//  }
 
     override fun onFragmentResult(requestCode: Int, resultCode: Int, data: Bundle?) {
         super.onFragmentResult(requestCode, resultCode, data)

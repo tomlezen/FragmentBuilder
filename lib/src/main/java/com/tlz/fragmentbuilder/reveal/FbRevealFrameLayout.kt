@@ -1,4 +1,4 @@
-package com.tlz.fragmentbuilder
+package com.tlz.fragmentbuilder.reveal
 
 import android.content.Context
 import android.graphics.Canvas

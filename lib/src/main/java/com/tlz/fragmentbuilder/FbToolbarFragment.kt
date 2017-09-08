@@ -100,10 +100,6 @@ abstract class FbToolbarFragment : FbFragment() {
       }
       initToolbar()
       ll.addView(onCreateContentView(inflater, ll))
-      TransitionManager.beginDelayedTransition(container, Slide(Gravity.END).apply {
-//        addTarget(R.id.fb_statusbar)
-//        addTarget(R.id.fb_toolbar)
-      })
       return ll
     }
   }
