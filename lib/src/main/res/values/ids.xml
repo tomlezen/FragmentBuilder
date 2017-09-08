@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="fb_statusbar" type="id" />
+    <item name="fb_toolbar" type="id" />
+</resources>

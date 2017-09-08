@@ -22,6 +22,8 @@ import com.transitionseverywhere.TransitionManager
 import android.support.v4.view.animation.FastOutLinearInInterpolator
 import android.support.v4.view.animation.LinearOutSlowInInterpolator
 import android.R.attr.visible
+import android.util.Log
+import com.transitionseverywhere.Transition
 import com.transitionseverywhere.TransitionSet
 import com.transitionseverywhere.extra.Scale
 
@@ -87,19 +89,21 @@ abstract class FbToolbarFragment : FbFragment() {
       ll.orientation = LinearLayout.VERTICAL
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && windowTranslucentStatus() && fitsSystemWindows) {
         statusbarPlaceholder = View(context)
+        statusbarPlaceholder?.id = R.id.fb_statusbar
         ll.addView(statusbarPlaceholder,
             ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, statusbarHeight()))
       }
       if (toolbarEnable) {
         toolbar = Toolbar(context)
+        toolbar?.id = R.id.fb_toolbar
         ll.addView(toolbar, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, toolbarHeight()))
       }
       initToolbar()
       ll.addView(onCreateContentView(inflater, ll))
-      val set = TransitionSet()
-          .setOrdering(1)
-          .addTransition(Slide(Gravity.END).addTarget())
-      TransitionManager.beginDelayedTransition(container, set)
+      TransitionManager.beginDelayedTransition(container, Slide(Gravity.END).apply {
+//        addTarget(R.id.fb_statusbar)
+//        addTarget(R.id.fb_toolbar)
+      })
       return ll
     }
   }
