@@ -13,16 +13,16 @@ import android.support.v7.app.AppCompatActivity
  */
 abstract class FbCompatActivity : AppCompatActivity() {
 
-  protected lateinit var  superFragmentManager: FbFragmentManager
+  protected lateinit var  fbFragmentManager: FbFragmentManager
 
   @CallSuper
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    superFragmentManager = FbFragmentManager.with(this, frameLayoutId())
+    fbFragmentManager = FbFragmentManager.with(this, frameLayoutId())
   }
 
   override fun onBackPressed() {
-    if (!superFragmentManager.onBackPress()) {
+    if (!fbFragmentManager.onBackPress()) {
       super.onBackPressed()
     }
   }
@@ -34,6 +34,5 @@ abstract class FbCompatActivity : AppCompatActivity() {
 
   protected abstract @IdRes
   fun frameLayoutId(): Int
-
 
 }
