@@ -30,13 +30,12 @@ fun Activity.setWindowStatusBarColor(color: Int): Boolean{
 }
 
 inline fun FbAnimationSet.endWithAction(crossinline action: () -> Unit): FbAnimationSet{
-  addAnimationListener(object: AnimationListener{
+  setAnimationListener(object: AnimationListener{
     override fun onAnimationRepeat(p0: Animation?) {
 
     }
 
     override fun onAnimationEnd(p0: Animation?) {
-      Log.d("test", "动画结束啦")
       action()
     }
 

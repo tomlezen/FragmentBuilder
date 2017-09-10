@@ -34,14 +34,14 @@ abstract class FbFragment : Fragment(), OnSwipeBackStateListener {
 
   protected var rootView: ViewGroup? = null
     private set(value) { field = value }
+  private var contentWrapper: FbNoAnimationFrameLayout? = null
   private var contentView: View? = null
 
   private var isCreate = false
   private var isViewCreate = false
   private var isLazyInit = false
   private var isSwipeFinish = false
-  private var isEnterTransition = false
-  private var isExitTransition = false
+  private var isTransition = false
 
   lateinit var fbFragmentManager: FbFragmentManager
 
@@ -52,35 +52,41 @@ abstract class FbFragment : Fragment(), OnSwipeBackStateListener {
   @CallSuper
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    if (arguments != null) {
-      requestCode = arguments.getInt(FbConst.KEY_FB_REQUEST_CODE)
-    }
+    requestCode = arguments?.getInt(FbConst.KEY_FB_REQUEST_CODE) ?: 0
   }
 
   override final fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation? {
-    val animation =  onCreateFbAnimation(transit, enter, nextAnim)
-
-    return animation?.let {
-      val fbas = FbAnimationSet(true).add(it).endWithAction { onAnimFinish(enter) }
-      if(!enter){
-        onCreateTransition(false)?.let { TransitionManager.beginDelayedTransition(rootView, it.startWithAction { isExitTransition = true }.endWithAction { fbas.notificationAnimationEnd() }) } ?: back()
-        contentView?.visibility = View.GONE
+    if(!isSwipeFinish){
+      val animation =  onCreateFbAnimation(transit, enter, nextAnim)
+      val animationSet = animation?.let { FbAnimationSet(true).add(it).endWithAction {
+        onAnimFinish(enter)
+        contentWrapper?.animationEnable = true
+        isTransition = false
+      } } ?: animation
+      onCreateTransition(false)?.let {
+        if(enter) contentView?.visibility = View.GONE
+        contentWrapper?.animationEnable = false
+        isTransition = true
+        TransitionManager.beginDelayedTransition(rootView, it.endWithAction { (animationSet as? FbAnimationSet)?.notificationAnimationEnd() })
+        if(enter) contentView?.visibility = View.VISIBLE
       }
-      fbas
-    } ?: super.onCreateAnimation(transit, enter, nextAnim)
+      return animationSet
+    } else{
+      return super.onCreateAnimation(transit, enter, nextAnim)
+    }
   }
 
   open protected fun onCreateFbAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation? {
-//    if((enter && isEnterTransition) || (!enter && isExitTransition)){
+    if(isTransition || isSwipeFinish){
       return AnimationUtils.loadAnimation(context, R.anim.empty)
-//    }else{
-//      if(nextAnim != 0){
-//        try {
-//          return AnimationUtils.loadAnimation(context, nextAnim)
-//        }catch (e: Exception){ }
-//      }
-//    }
-//    return super.onCreateAnimation(transit, enter, nextAnim)
+    }else{
+      if(nextAnim != 0){
+        try {
+          return AnimationUtils.loadAnimation(context, nextAnim)
+        }catch (e: Exception){ }
+      }
+    }
+    return super.onCreateAnimation(transit, enter, nextAnim)
   }
 
   override final fun onCreateAnimator(transit: Int, enter: Boolean, nextAnim: Int): Animator? {
@@ -98,18 +104,19 @@ abstract class FbFragment : Fragment(), OnSwipeBackStateListener {
   }
 
   override final fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-    onCreateTransition(true)?.let { TransitionManager.beginDelayedTransition(container, it.startWithAction { isEnterTransition = true }.endWithAction { onAnimFinish(true) }) }
     rootView = container
     if (contentView == null && inflater != null && container != null) {
       fbFragmentManager = FbFragmentManager.getManager(arguments.getString(FbConst.KEY_FRAGMENT_MANAGER_TAG))!!
       onCreateViewBefore()
+      contentWrapper = FbNoAnimationFrameLayout(context)
       contentView = onCreateView(inflater, container)
     }
     return if (contentView != null) {
       isCreate = true
       val parentView = contentView?.parent as? ViewGroup
       parentView?.removeView(contentView)
-      contentView
+      contentWrapper?.addView(contentView, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
+      contentWrapper
     } else {
       super.onCreateView(inflater, container, savedInstanceState)
     }
@@ -203,13 +210,7 @@ abstract class FbFragment : Fragment(), OnSwipeBackStateListener {
   }
 
   fun back() {
-//    if(!isSwipeFinish){
-//      isSwipeFinish = true
-//      onCreateTransition(false)?.let { TransitionManager.beginDelayedTransition(rootView, it.startWithAction { isExitTransition = true }) } ?: back()
-//      contentView?.visibility = View.GONE
-//    }else{
-      fbFragmentManager.backForResult(requestCode, resultCode, resultData)
-//    }
+    fbFragmentManager.backForResult(requestCode, resultCode, resultData)
   }
 
   internal fun backForSwipe(){
