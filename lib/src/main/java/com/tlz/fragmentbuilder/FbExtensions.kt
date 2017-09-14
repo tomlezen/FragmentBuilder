@@ -2,10 +2,8 @@ package com.tlz.fragmentbuilder
 
 import android.animation.Animator
 import android.animation.Animator.AnimatorListener
-import android.animation.AnimatorListenerAdapter
 import android.app.Activity
 import android.os.Build
-import android.util.Log
 import android.view.WindowManager
 import android.view.animation.Animation
 import android.view.animation.Animation.AnimationListener

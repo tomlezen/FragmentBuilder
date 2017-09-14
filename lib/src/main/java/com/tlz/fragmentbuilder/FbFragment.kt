@@ -30,7 +30,8 @@ abstract class FbFragment : Fragment(), OnSwipeBackStateListener {
     val RESULT_OK = 0
   }
 
-  internal var swipeBackEnable = true
+  var swipeBackEnable = true
+  var swipeBackMode = FbSwipeMode.LEFT
 
   protected var rootView: ViewGroup? = null
     private set(value) { field = value }

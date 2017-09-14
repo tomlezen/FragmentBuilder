@@ -7,11 +7,11 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.Animation
-import android.view.animation.AnimationUtils
+import com.tlz.fragmentbuilder.FbSwipeMode
 import com.tlz.fragmentbuilder.FbToolbarFragment
-import kotlinx.android.synthetic.main.fragment_test1.*
-import java.util.*
+import kotlinx.android.synthetic.main.fragment_test1.content1
+import kotlinx.android.synthetic.main.fragment_test1.tv_test
+import java.util.Random
 
 /**
  *
@@ -38,7 +38,14 @@ class TestFragment2 : FbToolbarFragment() {
     override fun onLazyInit() {
         super.onLazyInit()
         Log.d(TAG, "do onLazyInit")
-
+      swipeBackMode = when(Random().nextInt(6)){
+        1 -> FbSwipeMode.LEFT
+        2 -> FbSwipeMode.RIGHT
+        3 -> FbSwipeMode.TOP
+        4 -> FbSwipeMode.BOTTOM
+        5 -> FbSwipeMode.All
+        else -> FbSwipeMode.NONE
+      }
     }
 
     override fun onInit(savedInstanceState: Bundle?) {

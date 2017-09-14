@@ -14,7 +14,6 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.FrameLayout
 
-
 /**
  *
  * Created by Tomlezen.
@@ -25,59 +24,61 @@ class FbFrameLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
     attrs) {
 
   companion object {
-    val EDGE_LEFT = ViewDragHelper.EDGE_LEFT
-    val EDGE_RIGHT = ViewDragHelper.EDGE_RIGHT
+    private const val DEFAULT_SCRIM_COLOR = 0x99000000.toInt()
+    private const val FULL_ALPHA = 255
+    private const val DEFAULT_SCROLL_THRESHOLD = 0.4f
+    private const val OVERSCROLL_DISTANCE = 10
   }
 
-  private val DEFAULT_SCRIM_COLOR = 0x99000000.toInt()
-  private val FULL_ALPHA = 255
-  private val DEFAULT_SCROLL_THRESHOLD = 0.4f
-  private val OVERSCROLL_DISTANCE = 10
-
-  private var scrollFinishThreshold = DEFAULT_SCROLL_THRESHOLD
+  var scrollFinishThreshold = DEFAULT_SCROLL_THRESHOLD
+    set(value) {
+      if (value >= 1.0f || value <= 0) {
+        throw IllegalArgumentException("Threshold value should be between 0 and 1.0")
+      }
+      field = value
+    }
 
   private val helper: ViewDragHelper
 
-  private var scrollPercent: Float = 0.toFloat()
-  private var scrimOpacity: Float = 0.toFloat()
+  private var scrollPercent: Float = 0f
+  private var scrimOpacity: Float = 0f
 
-  private var shadowLeft: Drawable
-  private val tmpRect = Rect()
-
-  private var currentSwipeOrientation: Int = 0
+  private val shadowLeft: Drawable by lazy {
+    ContextCompat.getDrawable(context, R.mipmap.shadow_left)
+  }
+  private val shadowRight: Drawable by lazy {
+    ContextCompat.getDrawable(context, R.mipmap.shadow_right)
+  }
+  private val shadowTop: Drawable by lazy {
+    ContextCompat.getDrawable(context, R.mipmap.shadow_top)
+  }
+  private val shadowBottom: Drawable by lazy {
+    ContextCompat.getDrawable(context, R.mipmap.shadow_bottom)
+  }
+  private val drawnShadowRect = Rect()
 
   private var fbFragment: FbFragment? = null
 
+  private var curDragEdge = FbSwipeMode.NONE
+  private var dragMode = FbSwipeMode.LEFT
+    get() = fbFragment?.swipeBackMode ?: FbSwipeMode.NONE
+
   init {
     helper = ViewDragHelper.create(this, ViewDragCallback())
-    helper.setEdgeTrackingEnabled(ViewDragHelper.EDGE_LEFT)
-    shadowLeft = ContextCompat.getDrawable(context, R.mipmap.shadow_left)
+    helper.setEdgeTrackingEnabled(FbSwipeMode.All)
     super.setBackgroundColor(Color.TRANSPARENT)
   }
 
-  override fun setBackground(background: Drawable?) {
+  override fun setBackground(background: Drawable?) {}
 
-  }
+  override fun setBackgroundColor(color: Int) {}
 
-  override fun setBackgroundColor(color: Int) {
-
-  }
-
-  override fun setBackgroundResource(resid: Int) {
-
-  }
-
-  fun setScrollThreshold(threshold: Float) {
-    if (threshold >= 1.0f || threshold <= 0) {
-      throw IllegalArgumentException("Threshold value should be between 0 and 1.0")
-    }
-    scrollFinishThreshold = threshold
-  }
+  override fun setBackgroundResource(resid: Int) {}
 
   override fun drawChild(canvas: Canvas, child: View, drawingTime: Long): Boolean {
-    val isDrawView = getChildAt(childCount - 1) == child
     val drawChild = super.drawChild(canvas, child, drawingTime)
-    if (isDrawView && scrimOpacity > 0 && helper.viewDragState != ViewDragHelper.STATE_IDLE) {
+    if ((getChildAt(
+        childCount - 1) == child) && scrimOpacity > 0 && helper.viewDragState != ViewDragHelper.STATE_IDLE) {
       drawShadow(canvas, child)
       drawScrim(canvas, child)
     }
@@ -85,14 +86,39 @@ class FbFrameLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
   }
 
   private fun drawShadow(canvas: Canvas, child: View) {
-    val childRect = tmpRect
+    val childRect = drawnShadowRect
     child.getHitRect(childRect)
 
-    if (currentSwipeOrientation and EDGE_LEFT != 0) {
-      shadowLeft.setBounds(childRect.left - shadowLeft.intrinsicWidth, childRect.top,
-          childRect.left, childRect.bottom)
-      shadowLeft.alpha = (scrimOpacity * FULL_ALPHA).toInt()
-      shadowLeft.draw(canvas)
+    if (curDragEdge and dragMode != 0) {
+      var shadowDrawable: Drawable? = null
+      when (curDragEdge) {
+        FbSwipeMode.LEFT -> {
+          shadowDrawable = shadowLeft.apply {
+            setBounds(childRect.left - shadowLeft.intrinsicWidth, childRect.top, childRect.left,
+                childRect.bottom)
+          }
+        }
+        FbSwipeMode.RIGHT -> {
+          shadowDrawable = shadowRight.apply {
+            setBounds(childRect.right, childRect.top, childRect.right + shadowLeft.intrinsicWidth,
+                childRect.bottom)
+          }
+        }
+        FbSwipeMode.TOP -> {
+          shadowDrawable = shadowTop.apply {
+            setBounds(childRect.left, childRect.top - shadowTop.intrinsicHeight, childRect.right,
+                childRect.top)
+          }
+        }
+        FbSwipeMode.BOTTOM -> {
+          shadowDrawable = shadowBottom.apply {
+            setBounds(childRect.left, childRect.bottom, childRect.right,
+                childRect.bottom + shadowBottom.intrinsicHeight)
+          }
+        }
+      }
+      shadowDrawable?.alpha = (scrimOpacity * FULL_ALPHA).toInt()
+      shadowDrawable?.draw(canvas)
     }
   }
 
@@ -101,10 +127,21 @@ class FbFrameLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
     val alpha = (baseAlpha * scrimOpacity).toInt()
     val color = alpha shl 24
 
-    if (currentSwipeOrientation and EDGE_LEFT != 0) {
-      canvas.clipRect(0, 0, child.left, height)
-    } else if (currentSwipeOrientation and EDGE_RIGHT != 0) {
-      canvas.clipRect(child.right, 0, right, height)
+    if (curDragEdge and dragMode != 0) {
+      when (curDragEdge) {
+        FbSwipeMode.LEFT -> {
+          canvas.clipRect(0, 0, child.left, height)
+        }
+        FbSwipeMode.RIGHT -> {
+          canvas.clipRect(child.right, 0, right, height)
+        }
+        FbSwipeMode.TOP -> {
+          canvas.clipRect(0, 0, right, child.top)
+        }
+        FbSwipeMode.BOTTOM -> {
+          canvas.clipRect(0, child.bottom, right, bottom)
+        }
+      }
     }
     canvas.drawColor(color)
   }
@@ -115,48 +152,46 @@ class FbFrameLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
   }
 
   override fun computeScroll() {
-    scrimOpacity = 1 - scrollPercent
-    if (scrimOpacity >= 0) {
-      if (helper.continueSettling(true)) {
-        ViewCompat.postInvalidateOnAnimation(this)
-      }
+    scrimOpacity = 1f - scrollPercent
+    if (scrimOpacity >= 0f && helper.continueSettling(true)) {
+      ViewCompat.postInvalidateOnAnimation(this)
     }
   }
 
   internal inner class ViewDragCallback : ViewDragHelper.Callback() {
 
     override fun tryCaptureView(child: View, pointerId: Int): Boolean {
-      val dragEnable = helper.isEdgeTouched(
-          EDGE_LEFT, pointerId)
-      if (dragEnable) {
-        if (helper.isEdgeTouched(EDGE_LEFT, pointerId)) {
-          currentSwipeOrientation = EDGE_LEFT
-        } else if (helper.isEdgeTouched(
-            EDGE_RIGHT, pointerId)) {
-          currentSwipeOrientation = EDGE_RIGHT
-        }
-      }
-      return dragEnable
+      return child == getChildAt(childCount - 1) && helper.isEdgeTouched(dragMode, pointerId)
     }
 
     override fun clampViewPositionHorizontal(child: View, left: Int, dx: Int): Int {
-      var ret = 0
-      if (currentSwipeOrientation and EDGE_LEFT != 0) {
-        ret = Math.min(child.width, Math.max(left, 0))
-      } else if (currentSwipeOrientation and EDGE_RIGHT != 0) {
-        ret = Math.min(0, Math.max(left, -child.width))
+      return when (curDragEdge) {
+        FbSwipeMode.LEFT -> Math.min(child.width, Math.max(left, 0))
+        FbSwipeMode.RIGHT -> Math.min(0, Math.max(left, -child.width))
+        else -> 0
       }
-      return ret
+    }
+
+    override fun clampViewPositionVertical(child: View, top: Int, dy: Int): Int {
+      return when (curDragEdge) {
+        FbSwipeMode.TOP -> Math.min(child.height, Math.max(top, 0))
+        FbSwipeMode.BOTTOM -> Math.min(0, Math.max(top, -child.height))
+        else -> 0
+      }
     }
 
     override fun onViewPositionChanged(changedView: View, left: Int, top: Int, dx: Int, dy: Int) {
       super.onViewPositionChanged(changedView, left, top, dx, dy)
-      if (currentSwipeOrientation and EDGE_LEFT != 0) {
-        scrollPercent = Math.abs(left.toFloat() / (width + shadowLeft.intrinsicWidth))
-        fbFragment?.onScrollPercent(scrollPercent)
+      scrollPercent = when (curDragEdge) {
+        FbSwipeMode.LEFT -> Math.abs(left.toFloat() / (changedView.width + shadowLeft.intrinsicWidth))
+        FbSwipeMode.RIGHT -> Math.abs(left.toFloat() / (changedView.width + shadowRight.intrinsicWidth))
+        FbSwipeMode.TOP -> Math.abs(top.toFloat() / (changedView.height + shadowTop.intrinsicHeight))
+        FbSwipeMode.BOTTOM -> Math.abs(top.toFloat() / (changedView.height + shadowBottom.intrinsicHeight))
+        else -> 0f
       }
+      fbFragment?.onScrollPercent(scrollPercent)
       invalidate()
-      if (scrollPercent > 1) {
+      if (scrollPercent > 1f) {
         fbFragment?.backForSwipe()
       }
     }
@@ -165,13 +200,29 @@ class FbFrameLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
       return 1
     }
 
+    override fun getViewVerticalDragRange(child: View?): Int {
+      return 1
+    }
+
     override fun onViewReleased(releasedChild: View, xvel: Float, yvel: Float) {
       val childWidth = releasedChild.width
+      val childHeight = releasedChild.height
 
       var left = 0
-      val top = 0
-      if (currentSwipeOrientation and EDGE_LEFT != 0) {
-        left = if (xvel > 0 || xvel == 0f && scrollPercent > scrollFinishThreshold) childWidth + shadowLeft.intrinsicWidth + OVERSCROLL_DISTANCE else 0
+      var top = 0
+      when (curDragEdge) {
+        FbSwipeMode.LEFT -> {
+          left = if (xvel >= 0f && scrollPercent > scrollFinishThreshold) childWidth + shadowLeft.intrinsicWidth + OVERSCROLL_DISTANCE else 0
+        }
+        FbSwipeMode.RIGHT -> {
+          left = -if (xvel <= 0f && scrollPercent > scrollFinishThreshold) childWidth + shadowRight.intrinsicWidth + OVERSCROLL_DISTANCE else 0
+        }
+        FbSwipeMode.TOP -> {
+          top = if (yvel >= 0f && scrollPercent > scrollFinishThreshold) childHeight + shadowTop.intrinsicHeight + OVERSCROLL_DISTANCE else 0
+        }
+        FbSwipeMode.BOTTOM -> {
+          top = -if (yvel <= 0f && scrollPercent > scrollFinishThreshold) childHeight + shadowBottom.intrinsicHeight + OVERSCROLL_DISTANCE else 0
+        }
       }
 
       helper.settleCapturedViewAt(left, top)
@@ -184,9 +235,7 @@ class FbFrameLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
 
     override fun onEdgeTouched(edgeFlags: Int, pointerId: Int) {
       super.onEdgeTouched(edgeFlags, pointerId)
-      if (EDGE_LEFT and edgeFlags != 0) {
-        currentSwipeOrientation = edgeFlags
-      }
+      curDragEdge = edgeFlags
     }
   }
 
@@ -210,8 +259,8 @@ class FbFrameLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
     this.fbFragment = fbFragment
   }
 
-  internal fun unBind(fbFragment: FbFragment){
-    if(this.fbFragment == fbFragment){
+  internal fun unBind(fbFragment: FbFragment) {
+    if (this.fbFragment == fbFragment) {
       this.fbFragment = null
     }
   }
