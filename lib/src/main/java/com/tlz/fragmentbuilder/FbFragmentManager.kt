@@ -22,8 +22,8 @@ class FbFragmentManager private constructor(private val context: Context, privat
 
   private val fragmentManagerWrapper: WeakReference<FragmentManager> = WeakReference(fragmentManager)
 
-  var enter = R.anim.slide_in_from_right
-  var exit = R.anim.slide_out_from_right
+  var enter = R.anim.empty
+  var exit = R.anim.empty
 
   fun switch(clazz: Class<out Fragment>, init: (FragmentActionEditor.() -> Unit)? = null) {
     commit(FragmentActionEditor(clazz, FragmentActionType.SWITCH).apply {

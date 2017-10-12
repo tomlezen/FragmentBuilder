@@ -4,11 +4,16 @@ import android.graphics.Color
 import android.graphics.Rect
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import com.tlz.fragmentbuilder.FbSwipeMode
 import com.tlz.fragmentbuilder.FbToolbarFragment
+import com.transitionseverywhere.Slide
+import com.transitionseverywhere.Transition
 import kotlinx.android.synthetic.main.fragment_test1.content1
 import kotlinx.android.synthetic.main.fragment_test1.tv_test
 import java.util.Random
@@ -61,15 +66,27 @@ class TestFragment1 : FbToolbarFragment() {
         super.onViewCreated(view, savedInstanceState)
         content1.setBackgroundColor(Color.rgb(Random().nextInt(255), Random().nextInt(255), Random().nextInt(255)))
         tv_test.setOnClickListener {
-            fbFragmentManager.addForResult(if(Random().nextInt(10) % 2 == 1) TestFragment1::class.java else TestFragment2::class.java, 12312, {
-                val rect = Rect()
-                it.getGlobalVisibleRect(rect)
-//                revealAnim(rect.centerX(), rect.centerY(), Math.max(rect.width().toFloat(), rect.height().toFloat()), (tv_test.parent as ViewGroup).height / 2f)
-            })
-//          fbFragmentManager.switch(TestFragment1::class.java)
+//            fbFragmentManager.addForResult(if(Random().nextInt(10) % 2 == 1) TestFragment1::class.java else TestFragment2::class.java, 12312, {
+//                val rect = Rect()
+//                it.getGlobalVisibleRect(rect)
+////                revealAnim(rect.centerX(), rect.centerY(), Math.max(rect.width().toFloat(), rect.height().toFloat()), (tv_test.parent as ViewGroup).height / 2f)
+//            })
+          fbFragmentManager.switch(TestFragment2::class.java)
         }
         setResult(Random().nextInt(10000) + 1)
     }
+
+  override fun onCreateFbAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation? {
+    return AnimationUtils.loadAnimation(activity, R.anim.slide_out_from_left)
+  }
+
+//  override fun onCreateTransition(enter: Boolean): Transition? {
+//    return if(!enter){
+//      Slide(Gravity.END).setDuration(2000)
+//    }else{
+//      Slide(Gravity.START)
+//    }
+//  }
 
   //  override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation {
 //    if (revealAnim != null) {

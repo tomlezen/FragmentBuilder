@@ -1,5 +1,5 @@
 import org.gradle.internal.jvm.Jvm
-
+apply plugin: 'java-library'
 apply plugin: 'kotlin'
 
 dependencies {
@@ -8,17 +8,14 @@ dependencies {
     compile parent.ext.kotlinpoet
     compile parent.ext.auto_service
     compile parent.ext.auto_common
-    compileOnly files(Jvm.current().getToolsJar())
+    kapt "com.google.auto.service:auto-service:1.0-rc2"
+//    compileOnly files(Jvm.current().getToolsJar())
     compile project(path: ':annotations')
     compile 'com.google.android:android:4.1.1.4'
 }
 
-sourceCompatibility = JavaVersion.VERSION_1_7
-targetCompatibility = JavaVersion.VERSION_1_7
-
-sourceSets {
-    main.java.srcDirs += 'src/main/kotlin'
-}
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
 
 buildscript {
 

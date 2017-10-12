@@ -1,7 +1,14 @@
 package com.tlz.fragmentbuilder.example
 
 import android.os.Bundle
+import android.view.Gravity
 import com.tlz.fragmentbuilder.FbCompatActivity
+import com.tlz.fragmentbuilder.animation.FbAnimationSet
+import com.tlz.fragmentbuilder.endWithAction
+import com.transitionseverywhere.Slide
+import com.transitionseverywhere.TransitionManager
+import com.transitionseverywhere.TransitionSet
+import kotlinx.android.synthetic.main.activity_main.main_content
 
 class MainActivity : FbCompatActivity() {
 
@@ -13,5 +20,6 @@ class MainActivity : FbCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         fbFragmentManager.switch(TestFragment1::class.java)
+//        TransitionManager.beginDelayedTransition(main_content, Slide(Gravity.END))
     }
 }

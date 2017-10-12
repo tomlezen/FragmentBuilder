@@ -43,10 +43,10 @@ abstract class FbToolbarFragment : FbFragment() {
 
   protected var themeResId = 0
     get() {
-      if (context == null || field != 0) {
-        return field
+      return if (context == null || field != 0) {
+        field
       } else {
-        return context.packageManager.getActivityInfo(activity.componentName,
+        context.packageManager.getActivityInfo(activity.componentName,
             PackageManager.MATCH_DEFAULT_ONLY).themeResource
       }
     }

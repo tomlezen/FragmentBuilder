@@ -9,10 +9,11 @@ import kotlin.reflect.KClass
  * Date: 2017/7/14.
  * Time: 10:06.
  */
-@Retention(AnnotationRetention.RUNTIME)
-@Target(AnnotationTarget.FIELD)
 @MustBeDocumented
+@Repeatable
+@Retention(AnnotationRetention.SOURCE)
+@Target(AnnotationTarget.FIELD)
 annotation class Serializer(
-        val to: KClass<*>,
-        val serializer: KClass<out ArgsSerializer<*, *>>
+    val to: KClass<*>,
+    val serializer: KClass<out ArgsSerializer<*, *>>
 )

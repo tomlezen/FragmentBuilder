@@ -229,10 +229,6 @@ class FbFrameLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
       invalidate()
     }
 
-    override fun onViewDragStateChanged(state: Int) {
-      super.onViewDragStateChanged(state)
-    }
-
     override fun onEdgeTouched(edgeFlags: Int, pointerId: Int) {
       super.onEdgeTouched(edgeFlags, pointerId)
       curDragEdge = edgeFlags

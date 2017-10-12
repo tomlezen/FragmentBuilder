@@ -15,10 +15,12 @@
     <!--app:theme="@style/ThemeOverlay.AppCompat.ActionBar"-->
     <!--app:title="@string/app_name"/>-->
 
-    <FrameLayout
+    <LinearLayout
         android:id="@+id/content1"
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:gravity="center"
         >
 
         <TextView
@@ -28,6 +30,25 @@
             android:text="fragment"
             android:layout_gravity="center"/>
 
-    </FrameLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="fragment"
+            android:layout_gravity="center"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="fragment"
+            android:layout_gravity="center"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="fragment"
+            android:layout_gravity="center"/>
+
+
+    </LinearLayout>
 
 </LinearLayout>

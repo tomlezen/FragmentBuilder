@@ -8,8 +8,8 @@ package com.tlz.fragmentbuilder.annotation
  */
 interface ArgsSerializer<From, To> {
 
-    fun serialize(from: From): To
+  fun serialize(from: From): To
 
-    fun deserialize(to: To): From
+  fun deserialize(to: To): From
 
 }

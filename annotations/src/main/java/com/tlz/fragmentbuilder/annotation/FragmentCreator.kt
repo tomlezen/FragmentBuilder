@@ -7,7 +7,8 @@ package com.tlz.fragmentbuilder.annotation
  * Date: 2017/7/14.
  * Time: 10:08.
  */
-@Retention(AnnotationRetention.RUNTIME)
-@Target(AnnotationTarget.CLASS)
 @MustBeDocumented
+@Repeatable
+@Retention(AnnotationRetention.SOURCE)
+@Target(AnnotationTarget.CLASS)
 annotation class FragmentCreator

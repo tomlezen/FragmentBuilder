@@ -4,11 +4,14 @@ import android.graphics.Color
 import android.graphics.Rect
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.tlz.fragmentbuilder.FbSwipeMode
 import com.tlz.fragmentbuilder.FbToolbarFragment
+import com.transitionseverywhere.Slide
+import com.transitionseverywhere.Transition
 import kotlinx.android.synthetic.main.fragment_test1.content1
 import kotlinx.android.synthetic.main.fragment_test1.tv_test
 import java.util.Random
@@ -63,9 +66,18 @@ class TestFragment2 : FbToolbarFragment() {
                 it.getGlobalVisibleRect(rect)
 //                revealAnim(rect.centerX(), rect.centerY(), Math.max(rect.width().toFloat(), rect.height().toFloat()), (tv_test.parent as ViewGroup).height / 2f)
             })
+//          fbFragmentManager.switch(TestFragment1::class.java)
         }
         setResult(Random().nextInt(10000) + 1)
     }
+
+  override fun onCreateTransition(enter: Boolean): Transition? {
+    return if(!enter){
+      Slide(Gravity.END).setDuration(2000)
+    }else{
+      Slide(Gravity.START)
+    }
+  }
 
     override fun onFragmentResult(requestCode: Int, resultCode: Int, data: Bundle?) {
         super.onFragmentResult(requestCode, resultCode, data)
