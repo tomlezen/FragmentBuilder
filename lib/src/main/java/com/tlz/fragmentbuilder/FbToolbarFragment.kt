@@ -28,7 +28,6 @@ import com.transitionseverywhere.TransitionSet
 import com.transitionseverywhere.extra.Scale
 
 
-
 /**
  *
  * Created by Tomlezen.
@@ -75,7 +74,9 @@ abstract class FbToolbarFragment : FbFragment() {
   protected var fitsSystemWindows = true
   protected var displayHomeAsUpEnabled = false
     set(value) {
-      setNavigationIconRes(R.drawable.ic_fb_back)
+      if (navigationIcon == null) {
+        setNavigationIconRes(R.drawable.ic_fb_back)
+      }
       field = value
     }
 
@@ -96,7 +97,8 @@ abstract class FbToolbarFragment : FbFragment() {
       if (toolbarEnable) {
         toolbar = Toolbar(context)
         toolbar?.id = R.id.fb_toolbar
-        ll.addView(toolbar, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, toolbarHeight()))
+        ll.addView(toolbar,
+            ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, toolbarHeight()))
       }
       initToolbar()
       ll.addView(onCreateContentView(inflater, ll))
@@ -163,6 +165,12 @@ abstract class FbToolbarFragment : FbFragment() {
     if (isVisibleToUser && statusbarPlaceholder == null) {
       activity?.setWindowStatusBarColor(colorPrimaryDark)
     }
+  }
+
+  override fun onDestroy() {
+    toolbar?.setNavigationOnClickListener(null)
+    toolbar?.setOnMenuItemClickListener(null)
+    super.onDestroy()
   }
 
   @RequiresApi(Build.VERSION_CODES.KITKAT)
