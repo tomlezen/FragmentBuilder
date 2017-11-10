@@ -5,7 +5,6 @@ import android.animation.AnimatorInflater
 import android.os.Bundle
 import android.support.annotation.CallSuper
 import android.support.v4.app.Fragment
-import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -17,7 +16,6 @@ import com.tlz.fragmentbuilder.animation.FbAnimationSet
 import com.transitionseverywhere.Slide
 import com.transitionseverywhere.Transition
 import com.transitionseverywhere.TransitionManager
-import com.transitionseverywhere.TransitionSet
 
 
 /**

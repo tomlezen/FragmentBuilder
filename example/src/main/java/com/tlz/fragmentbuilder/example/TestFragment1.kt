@@ -60,18 +60,19 @@ class TestFragment1 : FbToolbarFragment() {
 
     override fun onDestroy() {
         super.onDestroy()
+      (activity as MainActivity).refWatcher.watch(this)
     }
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         content1.setBackgroundColor(Color.rgb(Random().nextInt(255), Random().nextInt(255), Random().nextInt(255)))
         tv_test.setOnClickListener {
-//            fbFragmentManager.addForResult(if(Random().nextInt(10) % 2 == 1) TestFragment1::class.java else TestFragment2::class.java, 12312, {
-//                val rect = Rect()
-//                it.getGlobalVisibleRect(rect)
-////                revealAnim(rect.centerX(), rect.centerY(), Math.max(rect.width().toFloat(), rect.height().toFloat()), (tv_test.parent as ViewGroup).height / 2f)
-//            })
-          fbFragmentManager.switch(TestFragment2::class.java)
+            fbFragmentManager.addForResult(if(Random().nextInt(10) % 2 == 1) TestFragment1::class.java else TestFragment2::class.java, 12312, {
+                val rect = Rect()
+                it.getGlobalVisibleRect(rect)
+//                revealAnim(rect.centerX(), rect.centerY(), Math.max(rect.width().toFloat(), rect.height().toFloat()), (tv_test.parent as ViewGroup).height / 2f)
+            })
+//          fbFragmentManager.switch(TestFragment2::class.java)
         }
         setResult(Random().nextInt(10000) + 1)
     }

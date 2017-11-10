@@ -84,4 +84,9 @@ class TestFragment2 : FbToolbarFragment() {
         Log.e(TAG, "i get resultCode = $resultCode; data = $data")
     }
 
+  override fun onDestroy() {
+    super.onDestroy()
+    (activity as MainActivity).refWatcher.watch(this)
+  }
+
 }

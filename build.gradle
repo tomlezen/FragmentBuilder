@@ -21,6 +21,7 @@ allprojects {
             auto_service_version = '1.0-rc2'
             auto_common_version = '0.8'
             toolbar_version = '1.1.1'
+            leakcanary_version = '1.5.1'
 
             kotlin_jre = "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
             kotlin_plugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
@@ -36,6 +37,9 @@ allprojects {
             kotlinpoet = "com.squareup:kotlinpoet:$kotlinpoet_version"
             auto_service = "com.google.auto.service:auto-service:$auto_service_version"
             auto_common = "com.google.auto:auto-common:$auto_common_version"
+
+            leakcanary = "com.squareup.leakcanary:leakcanary-android:$leakcanary_version"
+            leakcanary_no_op = "com.squareup.leakcanary:leakcanary-android-no-op:$leakcanary_version"
 
             toolbar = "com.alirezaafkar:toolbar:$toolbar_version"
         }

@@ -256,6 +256,7 @@ class FbFrameLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
   }
 
   internal fun unBind(fbFragment: FbFragment) {
+    helper.cancel()
     if (this.fbFragment == fbFragment) {
       this.fbFragment = null
     }
