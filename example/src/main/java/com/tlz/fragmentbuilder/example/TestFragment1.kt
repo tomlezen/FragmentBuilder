@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import android.widget.Toast
 import com.tlz.fragmentbuilder.FbSwipeMode
 import com.tlz.fragmentbuilder.FbToolbarFragment
 import com.transitionseverywhere.Slide
@@ -26,59 +27,71 @@ import java.util.Random
  */
 class TestFragment1 : FbToolbarFragment() {
 
-    override fun onCreateViewBefore() {
-        toolbarEnable = true
-        displayHomeAsUpEnabled = true
-        themeResId = R.style.AppTheme_Toolbar
-        title = "TestFragment${Random().nextInt(100)}"
-        fitsSystemWindows = true
+  private var isRun = true
+
+  override fun onCreateViewBefore() {
+    toolbarEnable = true
+    displayHomeAsUpEnabled = true
+    themeResId = R.style.AppTheme_Toolbar
+    title = "TestFragment${Random().nextInt(100)}"
+    fitsSystemWindows = true
+  }
+
+  override fun onCreateContentView(inflater: LayoutInflater, container: ViewGroup): View {
+    return inflater.inflate(R.layout.fragment_test1, container, false)
+  }
+
+  private val TAG = TestFragment1::class.java.simpleName
+
+  override fun onLazyInit() {
+    super.onLazyInit()
+    Log.d(TAG, "do onLazyInit")
+    swipeBackMode = when (Random().nextInt(6)) {
+      1 -> FbSwipeMode.LEFT
+      2 -> FbSwipeMode.RIGHT
+      3 -> FbSwipeMode.TOP
+      4 -> FbSwipeMode.BOTTOM
+      5 -> FbSwipeMode.All
+      else -> FbSwipeMode.NONE
     }
+  }
 
-    override fun onCreateContentView(inflater: LayoutInflater, container: ViewGroup): View {
-        return inflater.inflate(R.layout.fragment_test1, container, false)
-    }
-
-    private val TAG = TestFragment1::class.java.simpleName
-
-    override fun onLazyInit() {
-        super.onLazyInit()
-        Log.d(TAG, "do onLazyInit")
-      swipeBackMode = when(Random().nextInt(6)){
-        1 -> FbSwipeMode.LEFT
-        2 -> FbSwipeMode.RIGHT
-        3 -> FbSwipeMode.TOP
-        4 -> FbSwipeMode.BOTTOM
-        5 -> FbSwipeMode.All
-        else -> FbSwipeMode.NONE
-      }
-    }
-
-    override fun onInit(savedInstanceState: Bundle?) {
-        Log.d(TAG, "do onInit")
+  override fun onInit(savedInstanceState: Bundle?) {
+    Log.d(TAG, "do onInit")
 //        FbFragmentManager.with(this, R.id.content).switch(TestFragment2::class.java)
-    }
+  }
 
-    override fun onDestroy() {
-        super.onDestroy()
-      (activity as MainActivity).refWatcher.watch(this)
-    }
+  override fun onDestroy() {
+    isRun = false
+    super.onDestroy()
+    (activity as MainActivity).refWatcher.watch(this)
+  }
 
-    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        content1.setBackgroundColor(Color.rgb(Random().nextInt(255), Random().nextInt(255), Random().nextInt(255)))
-        tv_test.setOnClickListener {
-            fbFragmentManager.addForResult(if(Random().nextInt(10) % 2 == 1) TestFragment1::class.java else TestFragment2::class.java, 12312, {
-                val rect = Rect()
-                it.getGlobalVisibleRect(rect)
+  override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+    content1.setBackgroundColor(Color.rgb(Random().nextInt(255), Random().nextInt(255), Random().nextInt(255)))
+    tv_test.setOnClickListener {
+      fbFragmentManager.addForResult(if (Random().nextInt(10) % 2 == 1) TestFragment1::class.java else TestFragment2::class.java, 12312, {
+//        val rect = Rect()
+//        it.getGlobalVisibleRect(rect)
 //                revealAnim(rect.centerX(), rect.centerY(), Math.max(rect.width().toFloat(), rect.height().toFloat()), (tv_test.parent as ViewGroup).height / 2f)
-            })
+      })
 //          fbFragmentManager.switch(TestFragment2::class.java)
-        }
-        setResult(Random().nextInt(10000) + 1)
     }
+    setResult(Random().nextInt(10000) + 1)
+    Thread({
+      while (isRun){
+        Thread.sleep(2000)
+        activity?.runOnUiThread {
+          tv_test?.text = "${System.currentTimeMillis()}"
+        }
+      }
+    }).start()
+  }
 
-  override fun onCreateFbAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation? {
-    return AnimationUtils.loadAnimation(activity, R.anim.slide_out_from_left)
+  override fun onAnimFinish(enter: Boolean) {
+    super.onAnimFinish(enter)
+    Toast.makeText(context, "动画结束", Toast.LENGTH_SHORT).show()
   }
 
 //  override fun onCreateTransition(enter: Boolean): Transition? {
@@ -136,9 +149,9 @@ class TestFragment1 : FbToolbarFragment() {
 //    }
 //  }
 
-    override fun onFragmentResult(requestCode: Int, resultCode: Int, data: Bundle?) {
-        super.onFragmentResult(requestCode, resultCode, data)
-        Log.e(TAG, "i get resultCode = $resultCode; data = $data")
-    }
+  override fun onFragmentResult(requestCode: Int, resultCode: Int, data: Bundle?) {
+    super.onFragmentResult(requestCode, resultCode, data)
+    Log.e(TAG, "i get resultCode = $resultCode; data = $data")
+  }
 
 }

@@ -71,14 +71,6 @@ class TestFragment2 : FbToolbarFragment() {
         setResult(Random().nextInt(10000) + 1)
     }
 
-  override fun onCreateTransition(enter: Boolean): Transition? {
-    return if(!enter){
-      Slide(Gravity.END).setDuration(2000)
-    }else{
-      Slide(Gravity.START)
-    }
-  }
-
     override fun onFragmentResult(requestCode: Int, resultCode: Int, data: Bundle?) {
         super.onFragmentResult(requestCode, resultCode, data)
         Log.e(TAG, "i get resultCode = $resultCode; data = $data")

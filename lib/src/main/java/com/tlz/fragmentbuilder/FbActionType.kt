@@ -6,7 +6,7 @@ package com.tlz.fragmentbuilder
  * Date: 2017/7/13.
  * Time: 16:14.
  */
-enum class FragmentActionType {
+enum class FbActionType {
   SWITCH,
   ADD,
   BACK,

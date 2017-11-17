@@ -5,7 +5,6 @@ import android.animation.AnimatorInflater
 import android.os.Bundle
 import android.support.annotation.CallSuper
 import android.support.v4.app.Fragment
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,9 +12,6 @@ import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import com.tlz.fragmentbuilder.FbFrameLayout.OnSwipeBackStateListener
 import com.tlz.fragmentbuilder.animation.FbAnimationSet
-import com.transitionseverywhere.Slide
-import com.transitionseverywhere.Transition
-import com.transitionseverywhere.TransitionManager
 
 
 /**
@@ -37,14 +33,13 @@ abstract class FbFragment : Fragment(), OnSwipeBackStateListener {
     private set(value) {
       field = value
     }
-  private var contentWrapper: FbNoAnimationFrameLayout? = null
+  private var contentWrapper: FbFrameLayout? = null
   private var contentView: View? = null
 
   private var isCreate = false
   private var isViewCreate = false
   private var isLazyInit = false
   private var isSwipeFinish = false
-  private var isTransition = false
   var isSwitch = false
 
   lateinit var fbFragmentManager: FbFragmentManager
@@ -60,36 +55,18 @@ abstract class FbFragment : Fragment(), OnSwipeBackStateListener {
   }
 
   override final fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation? {
-    if (!isSwipeFinish) {
+    return if (!isSwipeFinish) {
       val animation = onCreateFbAnimation(transit, enter, nextAnim)
-      val animationSet = animation?.let {
-        FbAnimationSet(true).add(it).endWithAction {
-          onAnimFinish(enter)
-          contentWrapper?.animationEnable = true
-          isTransition = false
-        }
+      animation?.let {
+        FbAnimationSet(true).add(it).endWithAction { onAnimFinish(enter) }
       } ?: animation
-      val transition = onCreateTransition(enter)
-      if(transition == null){
-        contentWrapper?.animationEnable = true
-      }else{
-        if (enter) contentView?.visibility = View.GONE
-        contentWrapper?.animationEnable = false
-        isTransition = true
-        TransitionManager.beginDelayedTransition(rootView, transition.endWithAction {
-          (animationSet as? FbAnimationSet)?.notificationAnimationEnd()
-        })
-        if (enter) contentView?.visibility = View.VISIBLE
-      }
-
-      return animationSet
     } else {
       return super.onCreateAnimation(transit, enter, nextAnim)
     }
   }
 
   open protected fun onCreateFbAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation? {
-    if (isTransition || isSwipeFinish) {
+    if (isSwipeFinish) {
       return AnimationUtils.loadAnimation(context, R.anim.empty)
     } else {
       if (nextAnim != 0) {
@@ -119,13 +96,13 @@ abstract class FbFragment : Fragment(), OnSwipeBackStateListener {
   }
 
   override final fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
-      savedInstanceState: Bundle?): View? {
+                                  savedInstanceState: Bundle?): View? {
     rootView = container
     if (contentView == null && inflater != null && container != null) {
       fbFragmentManager = FbFragmentManager.getManager(
           arguments.getString(FbConst.KEY_FRAGMENT_MANAGER_TAG))!!
       onCreateViewBefore()
-      contentWrapper = FbNoAnimationFrameLayout(context)
+      contentWrapper = FbFrameLayout(context)
       contentView = onCreateView(inflater, container)
     }
     return if (contentView != null) {
@@ -175,20 +152,12 @@ abstract class FbFragment : Fragment(), OnSwipeBackStateListener {
 
   @CallSuper
   open fun onFbResume() {
-    if (rootView is FbFrameLayout) {
-      (rootView as FbFrameLayout).bind(this)
-    }
+    contentWrapper?.bind(this)
   }
 
   @CallSuper
   open fun onFbPause() {
-    if (rootView is FbFrameLayout) {
-      (rootView as FbFrameLayout).unBind(this)
-    }
-  }
-
-  open protected fun onCreateTransition(enter: Boolean): Transition? {
-    return Slide(Gravity.END)
+    contentWrapper?.unBind(this)
   }
 
   private fun prepareLazyInit() {
@@ -214,16 +183,16 @@ abstract class FbFragment : Fragment(), OnSwipeBackStateListener {
   override fun onScrollPercent(scrollPercent: Float) {
   }
 
-  fun switch(clazz: Class<out Fragment>, init: (FragmentActionEditor.() -> Unit)? = null) {
+  fun switch(clazz: Class<out Fragment>, init: (FbActionEditor.() -> Unit)? = null) {
     fbFragmentManager.switch(clazz, init)
   }
 
-  fun add(clazz: Class<out Fragment>, init: (FragmentActionEditor.() -> Unit)? = null) {
+  fun add(clazz: Class<out Fragment>, init: (FbActionEditor.() -> Unit)? = null) {
     fbFragmentManager.add(clazz, init)
   }
 
   fun addForResult(clazz: Class<out Fragment>, requestCode: Int,
-      init: (FragmentActionEditor.() -> Unit)? = null) {
+                   init: (FbActionEditor.() -> Unit)? = null) {
     fbFragmentManager.addForResult(clazz, requestCode, init)
   }
 

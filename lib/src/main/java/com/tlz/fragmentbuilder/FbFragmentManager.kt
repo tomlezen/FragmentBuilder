@@ -7,7 +7,7 @@ import android.support.annotation.IdRes
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
 import android.support.v4.app.FragmentManager
-import com.tlz.fragmentbuilder.FragmentActionType.BACK
+import com.tlz.fragmentbuilder.FbActionType.BACK
 import java.lang.ref.WeakReference
 
 /**
@@ -18,36 +18,36 @@ import java.lang.ref.WeakReference
  * manage fragment
  */
 class FbFragmentManager private constructor(private val context: Context, private val TAG: String,
-    fragmentManager: FragmentManager, @IdRes private val frameLayoutId: Int) {
+                                            fragmentManager: FragmentManager, @IdRes private val frameLayoutId: Int) {
 
   private val fragmentManagerWrapper: WeakReference<FragmentManager> = WeakReference(fragmentManager)
 
   var enter = R.anim.empty
   var exit = R.anim.empty
 
-  fun switch(clazz: Class<out Fragment>, init: (FragmentActionEditor.() -> Unit)? = null) {
-    commit(FragmentActionEditor(clazz, FragmentActionType.SWITCH).apply {
+  fun switch(clazz: Class<out Fragment>, init: (FbActionEditor.() -> Unit)? = null) {
+    commit(FbActionEditor(clazz, FbActionType.SWITCH).apply {
       init?.let { this.apply(init) }
     })
   }
 
-  fun add(clazz: Class<out Fragment>, init: (FragmentActionEditor.() -> Unit)? = null) {
-    commit(FragmentActionEditor(clazz, FragmentActionType.ADD).apply {
+  fun add(clazz: Class<out Fragment>, init: (FbActionEditor.() -> Unit)? = null) {
+    commit(FbActionEditor(clazz, FbActionType.ADD).apply {
       init?.let { this.apply(init) }
     })
   }
 
   fun addForResult(clazz: Class<out Fragment>, requestCode: Int,
-      init: (FragmentActionEditor.() -> Unit)? = null) {
-    commit(FragmentActionEditor(clazz, FragmentActionType.ADD, requestCode).apply {
+                   init: (FbActionEditor.() -> Unit)? = null) {
+    commit(FbActionEditor(clazz, FbActionType.ADD, requestCode).apply {
       init?.let { this.apply(init) }
     })
   }
 
-  fun back() = commit(FragmentActionEditor(null, FragmentActionType.BACK))
+  fun back() = commit(FbActionEditor(null, FbActionType.BACK))
 
   fun backForResult(requestCode: Int, resultCode: Int, data: Bundle?) {
-    commit(FragmentActionEditor(null, FragmentActionType.BACK, requestCode).apply {
+    commit(FbActionEditor(null, FbActionType.BACK, requestCode).apply {
       this.resultCode = resultCode
       data?.let {
         this.data = it
@@ -55,25 +55,25 @@ class FbFragmentManager private constructor(private val context: Context, privat
     })
   }
 
-  private fun commit(editor: FragmentActionEditor): Int {
+  private fun commit(editor: FbActionEditor): Int {
     if (editor.action != BACK) {
       editor.data.putString(FbConst.KEY_FRAGMENT_MANAGER_TAG, TAG)
     }
     return when (editor.action) {
-      FragmentActionType.SWITCH -> {
+      FbActionType.SWITCH -> {
         doSwitch(editor)
       }
-      FragmentActionType.ADD -> {
+      FbActionType.ADD -> {
         doAdd(editor)
       }
-      FragmentActionType.BACK -> {
+      FbActionType.BACK -> {
         doBack(editor)
       }
     }
   }
 
   @SuppressLint("RestrictedApi")
-  private fun doSwitch(editor: FragmentActionEditor): Int {
+  private fun doSwitch(editor: FbActionEditor): Int {
     return fragmentManger()?.beginTransaction()?.let {
       it.setCustomAnimations(enter, exit)
       try {
@@ -101,7 +101,7 @@ class FbFragmentManager private constructor(private val context: Context, privat
     } ?: 0
   }
 
-  private fun doAdd(editor: FragmentActionEditor): Int {
+  private fun doAdd(editor: FbActionEditor): Int {
     if (editor.requestCode != 0) {
       editor.data.putInt(FbConst.KEY_FB_REQUEST_CODE, editor.requestCode)
     }
@@ -112,7 +112,7 @@ class FbFragmentManager private constructor(private val context: Context, privat
       if (editor.isClearPrev) {
         fragmentManger()?.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
       }
-      it.setCustomAnimations(enter, exit)
+      it.setCustomAnimations(enter, exit, enter, exit)
       it.add(frameLayoutId, fragment, editor.TAG)
       it.addToBackStack(editor.TAG)
       fragment?.userVisibleHint = true
@@ -125,7 +125,7 @@ class FbFragmentManager private constructor(private val context: Context, privat
     } ?: -1
   }
 
-  private fun doBack(editor: FragmentActionEditor): Int {
+  private fun doBack(editor: FbActionEditor): Int {
     try {
       if (canBack() && fragmentManger()?.popBackStackImmediate() == true) {
         (topFragment() as? FbFragment)?.let {
@@ -175,53 +175,46 @@ class FbFragmentManager private constructor(private val context: Context, privat
     return false
   }
 
-  fun fragmentManger(): FragmentManager? {
-    return fragmentManagerWrapper.get()
-  }
+  fun fragmentManger(): FragmentManager? = fragmentManagerWrapper.get()
 
   companion object {
 
     /** SuperFragmentManager collection. */
-    private val mamagerMap = mutableMapOf<String, FbFragmentManager>()
+    private val managerMap = mutableMapOf<String, FbFragmentManager>()
 
     fun with(activity: FragmentActivity, @IdRes frameLayoutId: Int): FbFragmentManager {
       return with(activity, activity.javaClass.canonicalName, activity.supportFragmentManager,
           frameLayoutId)
     }
 
-    fun with(fragment: Fragment, @IdRes frameLayoutId: Int): FbFragmentManager {
-      return with(fragment.context, fragment.javaClass.canonicalName, fragment.childFragmentManager, frameLayoutId)
-    }
+    fun with(fragment: Fragment, @IdRes frameLayoutId: Int): FbFragmentManager =
+        with(fragment.context, fragment.javaClass.canonicalName, fragment.childFragmentManager, frameLayoutId)
 
     private fun with(context: Context, TAG: String,
-        fragmentManager: FragmentManager, @IdRes frameLayoutId: Int): FbFragmentManager {
-      var manager = mamagerMap[TAG]
+                     fragmentManager: FragmentManager, @IdRes frameLayoutId: Int): FbFragmentManager {
+      var manager = managerMap[TAG]
       if (manager == null) {
         manager = FbFragmentManager(context.applicationContext, TAG, fragmentManager,
             frameLayoutId)
-        mamagerMap.put(TAG, manager)
+        managerMap.put(TAG, manager)
       }
       return manager
     }
 
-    fun getManager(fragment: Fragment): FbFragmentManager? {
-      return mamagerMap[fragment.javaClass.canonicalName]
-    }
+    fun getManager(fragment: Fragment): FbFragmentManager? =
+        managerMap[fragment.javaClass.canonicalName]
 
-    fun getManager(activity: FragmentActivity): FbFragmentManager? {
-      return mamagerMap[activity.javaClass.canonicalName]
-    }
+    fun getManager(activity: FragmentActivity): FbFragmentManager? =
+        managerMap[activity.javaClass.canonicalName]
 
-    internal fun getManager(TAG: String): FbFragmentManager? {
-      return mamagerMap[TAG]
-    }
+    fun getManager(TAG: String): FbFragmentManager? = managerMap[TAG]
 
     fun remove(fragment: Fragment) {
-      mamagerMap.remove(fragment.javaClass.canonicalName)
+      managerMap.remove(fragment.javaClass.canonicalName)
     }
 
     fun remove(activity: FragmentActivity) {
-      mamagerMap.remove(activity.javaClass.canonicalName)
+      managerMap.remove(activity.javaClass.canonicalName)
     }
 
   }

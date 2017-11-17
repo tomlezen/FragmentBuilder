@@ -11,9 +11,9 @@ import java.io.Serializable
  * Date: 2017/7/13.
  * Time: 16:13.
  */
-class FragmentActionEditor internal constructor(
+class FbActionEditor internal constructor(
     internal val clazz: Class<out Fragment>?,
-    internal val action: FragmentActionType,
+    internal val action: FbActionType,
     internal val requestCode: Int = 0) {
   val TAG: String = System.currentTimeMillis().toString()
 

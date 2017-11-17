@@ -12,20 +12,10 @@ import android.support.annotation.RequiresApi
 import android.support.v7.content.res.AppCompatResources
 import android.support.v7.widget.Toolbar
 import android.util.TypedValue
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
-import com.transitionseverywhere.Slide
-import com.transitionseverywhere.TransitionManager
-import android.support.v4.view.animation.FastOutLinearInInterpolator
-import android.support.v4.view.animation.LinearOutSlowInInterpolator
-import android.R.attr.visible
-import android.util.Log
-import com.transitionseverywhere.Transition
-import com.transitionseverywhere.TransitionSet
-import com.transitionseverywhere.extra.Scale
 
 
 /**

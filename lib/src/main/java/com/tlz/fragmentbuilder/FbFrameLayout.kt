@@ -160,25 +160,22 @@ class FbFrameLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
 
   internal inner class ViewDragCallback : ViewDragHelper.Callback() {
 
-    override fun tryCaptureView(child: View, pointerId: Int): Boolean {
-      return child == getChildAt(childCount - 1) && helper.isEdgeTouched(dragMode, pointerId)
-    }
+    override fun tryCaptureView(child: View, pointerId: Int): Boolean =
+        helper.isEdgeTouched(dragMode, pointerId)
 
-    override fun clampViewPositionHorizontal(child: View, left: Int, dx: Int): Int {
-      return when (curDragEdge) {
-        FbSwipeMode.LEFT -> Math.min(child.width, Math.max(left, 0))
-        FbSwipeMode.RIGHT -> Math.min(0, Math.max(left, -child.width))
-        else -> 0
-      }
-    }
+    override fun clampViewPositionHorizontal(child: View, left: Int, dx: Int): Int =
+        when (curDragEdge) {
+          FbSwipeMode.LEFT -> Math.min(child.width, Math.max(left, 0))
+          FbSwipeMode.RIGHT -> Math.min(0, Math.max(left, -child.width))
+          else -> 0
+        }
 
-    override fun clampViewPositionVertical(child: View, top: Int, dy: Int): Int {
-      return when (curDragEdge) {
-        FbSwipeMode.TOP -> Math.min(child.height, Math.max(top, 0))
-        FbSwipeMode.BOTTOM -> Math.min(0, Math.max(top, -child.height))
-        else -> 0
-      }
-    }
+    override fun clampViewPositionVertical(child: View, top: Int, dy: Int): Int =
+        when (curDragEdge) {
+          FbSwipeMode.TOP -> Math.min(child.height, Math.max(top, 0))
+          FbSwipeMode.BOTTOM -> Math.min(0, Math.max(top, -child.height))
+          else -> 0
+        }
 
     override fun onViewPositionChanged(changedView: View, left: Int, top: Int, dx: Int, dy: Int) {
       super.onViewPositionChanged(changedView, left, top, dx, dy)
@@ -196,13 +193,9 @@ class FbFrameLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
       }
     }
 
-    override fun getViewHorizontalDragRange(child: View): Int {
-      return 1
-    }
+    override fun getViewHorizontalDragRange(child: View): Int = 1
 
-    override fun getViewVerticalDragRange(child: View?): Int {
-      return 1
-    }
+    override fun getViewVerticalDragRange(child: View?): Int = 1
 
     override fun onViewReleased(releasedChild: View, xvel: Float, yvel: Float) {
       val childWidth = releasedChild.width

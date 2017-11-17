@@ -35,7 +35,5 @@ open class FbRevealFrameLayout : FrameLayout, RevealViewGroup {
         }
     }
 
-    override fun getViewRevealManager(): ViewRevealManager {
-        return rvm
-    }
+    override fun getViewRevealManager(): ViewRevealManager = rvm
 }
