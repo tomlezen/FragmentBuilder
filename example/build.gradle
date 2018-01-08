@@ -25,14 +25,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
-//    kapt {
-//        generateStubs = true
-//        arguments {
-//            arg("suffix", "Customized")
-//            arg("generate.kotlin.code", "true")
-//        }
-//    }
 }
 
 dependencies {
@@ -41,11 +33,11 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     compile parent.ext.kotlin_jre
-    compile 'com.android.support:appcompat-v7:26.0.0-beta2'
+    compile 'com.android.support:appcompat-v7:26.1.0'
     testCompile 'junit:junit:4.12'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
 //    compile 'com.github.Tomlezen:FragmentBuilder:0.0.1-pre7'
-    compile project(path: ':lib')
+    compile project(':lib')
 //    compile project(path: ':annotations')
 //    kapt project(':compiler')
     debugCompile parent.ext.leakcanary

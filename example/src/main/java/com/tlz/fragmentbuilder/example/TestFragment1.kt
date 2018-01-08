@@ -79,14 +79,14 @@ class TestFragment1 : FbToolbarFragment() {
 //          fbFragmentManager.switch(TestFragment2::class.java)
     }
     setResult(Random().nextInt(10000) + 1)
-    Thread({
-      while (isRun){
-        Thread.sleep(2000)
-        activity?.runOnUiThread {
-          tv_test?.text = "${System.currentTimeMillis()}"
-        }
-      }
-    }).start()
+//    Thread({
+//      while (isRun){
+//        Thread.sleep(2000)
+//        activity?.runOnUiThread {
+//          tv_test?.text = "${System.currentTimeMillis()}"
+//        }
+//      }
+//    }).start()
   }
 
   override fun onAnimFinish(enter: Boolean) {
