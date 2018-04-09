@@ -35,8 +35,9 @@ abstract class FbToolbarFragment : FbFragment() {
       return if (context == null || field != 0) {
         field
       } else {
-        context.packageManager.getActivityInfo(activity.componentName,
-            PackageManager.MATCH_DEFAULT_ONLY).themeResource
+        activity?.let {
+          it.packageManager.getActivityInfo(it.componentName, PackageManager.MATCH_DEFAULT_ONLY).themeResource
+        } ?: 0
       }
     }
 
@@ -165,35 +166,38 @@ abstract class FbToolbarFragment : FbFragment() {
 
   @RequiresApi(Build.VERSION_CODES.KITKAT)
   private fun windowTranslucentStatus(): Boolean {
-    val ta = context.obtainStyledAttributes(intArrayOf(android.R.attr.windowTranslucentStatus))
+    val ta = context!!.obtainStyledAttributes(intArrayOf(android.R.attr.windowTranslucentStatus))
     val value = ta.getBoolean(ta.getIndex(0), false)
     ta.recycle()
     return value
   }
 
-  protected fun statusBarHeight(): Int {
-    return resources.getDimensionPixelSize(
-        Resources.getSystem().getIdentifier("status_bar_height", "dimen", "android"))
-  }
+  protected fun statusBarHeight(): Int =
+     resources.getDimensionPixelSize(Resources.getSystem().getIdentifier("status_bar_height", "dimen", "android"))
 
-  protected fun toolbarHeight(): Int {
-    val ta = context.obtainStyledAttributes(intArrayOf(android.R.attr.actionBarSize))
-    val value = ta.getDimensionPixelSize(ta.getIndex(0), 0)
-    ta.recycle()
-    return value
-  }
+  protected fun toolbarHeight(): Int =
+    context?.let {
+      val ta = context!!.obtainStyledAttributes(intArrayOf(android.R.attr.actionBarSize))
+      val value = ta.getDimensionPixelSize(ta.getIndex(0), 0)
+      ta.recycle()
+      value
+    } ?: 0
 
   protected open fun onNavigationOnClick() {
     onBackPress()
   }
 
   protected fun setNavigationIconRes(@DrawableRes resId: Int) {
-    navigationIcon = AppCompatResources.getDrawable(context, resId)
+    context?.let {
+      navigationIcon = AppCompatResources.getDrawable(it, resId)
+    }
   }
 
   protected fun invalidateOptionsMenu() {
     toolbar?.menu?.clear()
-    onCreateOptionsMenu(toolbar!!.menu, activity.menuInflater)
+    activity?.let {
+      onCreateOptionsMenu(toolbar!!.menu, it.menuInflater)
+    }
   }
 
   abstract protected fun onCreateContentView(inflater: LayoutInflater, container: ViewGroup): View
