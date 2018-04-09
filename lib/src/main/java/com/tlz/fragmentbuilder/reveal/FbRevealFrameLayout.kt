@@ -17,23 +17,23 @@ import com.tlz.fragmentbuilder.reveal.ViewRevealManager
  */
 open class FbRevealFrameLayout : FrameLayout, RevealViewGroup {
 
-    private val rvm: ViewRevealManager by lazy { ViewRevealManager() }
+  private val rvm: ViewRevealManager by lazy { ViewRevealManager() }
 
-    constructor(context: Context?) : super(context)
-    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes)
+  constructor(context: Context?) : super(context)
+  constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
+  constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
+  constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes)
 
-    override fun drawChild(canvas: Canvas, child: View, drawingTime: Long): Boolean {
-        try {
-            canvas.save()
+  override fun drawChild(canvas: Canvas, child: View, drawingTime: Long): Boolean {
+    try {
+      canvas.save()
 
-            rvm.transform(canvas, child)
-            return super.drawChild(canvas, child, drawingTime)
-        } finally {
-            canvas.restore()
-        }
+      rvm.transform(canvas, child)
+      return super.drawChild(canvas, child, drawingTime)
+    } finally {
+      canvas.restore()
     }
+  }
 
-    override fun getViewRevealManager(): ViewRevealManager = rvm
+  override fun getViewRevealManager(): ViewRevealManager = rvm
 }

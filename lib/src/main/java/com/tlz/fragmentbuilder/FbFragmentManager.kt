@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentActivity
 import android.support.v4.app.FragmentManager
 import com.tlz.fragmentbuilder.FbActionType.BACK
 import java.lang.ref.WeakReference
+import kotlin.reflect.KClass
 
 /**
  *
@@ -17,29 +18,33 @@ import java.lang.ref.WeakReference
  * Time: 15:11.
  * manage fragment
  */
-class FbFragmentManager private constructor(private val context: Context, private val TAG: String,
-                                            fragmentManager: FragmentManager, @IdRes private val frameLayoutId: Int) {
+class FbFragmentManager private constructor(
+    private val context: Context,
+    private val TAG: String,
+    fragmentManager: FragmentManager,
+    @IdRes private val frameLayoutId: Int
+) {
 
   private val fragmentManagerWrapper: WeakReference<FragmentManager> = WeakReference(fragmentManager)
 
   var enter = R.anim.empty
   var exit = R.anim.empty
 
-  fun switch(clazz: Class<out Fragment>, init: (FbActionEditor.() -> Unit)? = null) {
-    commit(FbActionEditor(clazz, FbActionType.SWITCH).apply {
+  fun switch(kclass: KClass<out Fragment>, init: (FbActionEditor.() -> Unit)? = null) {
+    commit(FbActionEditor(kclass, FbActionType.SWITCH).apply {
       init?.let { this.apply(init) }
     })
   }
 
-  fun add(clazz: Class<out Fragment>, init: (FbActionEditor.() -> Unit)? = null) {
-    commit(FbActionEditor(clazz, FbActionType.ADD).apply {
+  fun add(kclass: KClass<out Fragment>, init: (FbActionEditor.() -> Unit)? = null) {
+    commit(FbActionEditor(kclass, FbActionType.ADD).apply {
       init?.let { this.apply(init) }
     })
   }
 
-  fun addForResult(clazz: Class<out Fragment>, requestCode: Int,
+  fun addForResult(kclass: KClass<out Fragment>, requestCode: Int,
                    init: (FbActionEditor.() -> Unit)? = null) {
-    commit(FbActionEditor(clazz, FbActionType.ADD, requestCode).apply {
+    commit(FbActionEditor(kclass, FbActionType.ADD, requestCode).apply {
       init?.let { this.apply(init) }
     })
   }
@@ -86,7 +91,7 @@ class FbFragmentManager private constructor(private val context: Context, privat
         e.printStackTrace()
       }
 
-      val fragment = Fragment.instantiate(context, editor.clazz?.name, editor.data)
+      val fragment = Fragment.instantiate(context, editor.kclass?.java?.name, editor.data)
       fragment.check()
       it.replace(frameLayoutId, fragment, editor.TAG)
 
@@ -106,7 +111,7 @@ class FbFragmentManager private constructor(private val context: Context, privat
       editor.data.putInt(FbConst.KEY_FB_REQUEST_CODE, editor.requestCode)
     }
     val topFragment = topFragment()
-    val fragment = Fragment.instantiate(context, editor.clazz?.name, editor.data)
+    val fragment = Fragment.instantiate(context, editor.kclass?.java?.name, editor.data)
     fragment.check()
     return fragmentManger()?.beginTransaction()?.let {
       if (editor.isClearPrev) {

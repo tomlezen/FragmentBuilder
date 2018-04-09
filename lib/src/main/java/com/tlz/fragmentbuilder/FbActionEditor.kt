@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.os.Parcelable
 import android.support.v4.app.Fragment
 import java.io.Serializable
+import kotlin.reflect.KClass
 
 /**
  *
@@ -12,7 +13,7 @@ import java.io.Serializable
  * Time: 16:13.
  */
 class FbActionEditor internal constructor(
-    internal val clazz: Class<out Fragment>?,
+    internal val kclass: KClass<out Fragment>?,
     internal val action: FbActionType,
     internal val requestCode: Int = 0) {
   val TAG: String = System.currentTimeMillis().toString()

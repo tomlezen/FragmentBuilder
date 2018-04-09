@@ -7,7 +7,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.0.1'
+        classpath 'com.android.tools.build:gradle:3.1.0'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.0'
     }
 }
@@ -15,9 +15,9 @@ buildscript {
 allprojects {
     allprojects{
         ext{
-            kotlin_version = '1.2.10'
+            kotlin_version = '1.2.30'
             kotlin_coroutine_version = '0.15'
-            appcompat_verision = '26.1.0'
+            appcompat_verision = '27.1.0'
             kotlinpoet_version = '0.5.0'
             auto_service_version = '1.0-rc2'
             auto_common_version = '0.8'

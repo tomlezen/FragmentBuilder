@@ -22,7 +22,7 @@ class MainActivity : FbCompatActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_main)
-    fbFragmentManager.switch(TestFragment1::class.java)
+    fbFragmentManager.switch(TestFragment1::class)
     refWatcher = LeakCanary.install(application)
     fbFragmentManager.enter = R.anim.slide_in_from_right
     fbFragmentManager.exit = R.anim.slide_out_from_right

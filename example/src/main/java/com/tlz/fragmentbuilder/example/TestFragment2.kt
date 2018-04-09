@@ -60,7 +60,7 @@ class TestFragment2 : FbToolbarFragment() {
         super.onViewCreated(view, savedInstanceState)
         content1.setBackgroundColor(Color.rgb(Random().nextInt(255), Random().nextInt(255), Random().nextInt(255)))
         tv_test.setOnClickListener {
-            fbFragmentManager.addForResult(if(Random().nextInt(10) % 2 == 1) TestFragment1::class.java else TestFragment2::class.java, 12312, {
+            fbFragmentManager.addForResult(if(Random().nextInt(10) % 2 == 1) TestFragment1::class else TestFragment2::class, 12312, {
 //                data = null
                 val rect = Rect()
                 it.getGlobalVisibleRect(rect)

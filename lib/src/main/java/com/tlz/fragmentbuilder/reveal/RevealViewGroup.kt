@@ -8,6 +8,6 @@ package com.tlz.fragmentbuilder.reveal
  */
 interface RevealViewGroup {
 
-    fun getViewRevealManager(): ViewRevealManager
+  fun getViewRevealManager(): ViewRevealManager
 
 }

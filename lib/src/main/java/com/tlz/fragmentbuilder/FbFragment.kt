@@ -1,7 +1,5 @@
 package com.tlz.fragmentbuilder
 
-import android.animation.Animator
-import android.animation.AnimatorInflater
 import android.os.Bundle
 import android.support.annotation.CallSuper
 import android.support.v4.app.Fragment
@@ -12,6 +10,7 @@ import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import com.tlz.fragmentbuilder.FbFrameLayout.OnSwipeBackStateListener
 import com.tlz.fragmentbuilder.animation.FbAnimationSet
+import kotlin.reflect.KClass
 
 
 /**
@@ -67,11 +66,11 @@ abstract class FbFragment : Fragment(), OnSwipeBackStateListener {
 
   open protected fun onCreateFbAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation? {
     if (isSwipeFinish) {
-      return AnimationUtils.loadAnimation(context, R.anim.empty)
+      return AnimationUtils.loadAnimation(activity, R.anim.empty)
     } else {
       if (nextAnim != 0) {
         try {
-          return AnimationUtils.loadAnimation(context, nextAnim)
+          return AnimationUtils.loadAnimation(activity, nextAnim)
         } catch (e: Exception) {
         }
       }
@@ -79,30 +78,13 @@ abstract class FbFragment : Fragment(), OnSwipeBackStateListener {
     return super.onCreateAnimation(transit, enter, nextAnim)
   }
 
-  override final fun onCreateAnimator(transit: Int, enter: Boolean, nextAnim: Int): Animator? {
-    val animator = onCreateFbAnimator(transit, enter, nextAnim)
-    return animator?.let { it.endWithAction { onAnimFinish(enter) } } ?: super.onCreateAnimator(
-        transit, enter, nextAnim)
-  }
-
-  open protected fun onCreateFbAnimator(transit: Int, enter: Boolean, nextAnim: Int): Animator? {
-    if (nextAnim != 0) {
-      try {
-        return AnimatorInflater.loadAnimator(context, nextAnim)
-      } catch (e: Exception) {
-      }
-    }
-    return super.onCreateAnimator(transit, enter, nextAnim)
-  }
-
-  override final fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
-                                  savedInstanceState: Bundle?): View? {
+  override final fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
     rootView = container
-    if (contentView == null && inflater != null && container != null) {
-      fbFragmentManager = FbFragmentManager.getManager(
-          arguments.getString(FbConst.KEY_FRAGMENT_MANAGER_TAG))!!
+    val managerTag = arguments?.getString(FbConst.KEY_FRAGMENT_MANAGER_TAG)
+    if (contentView == null && container != null && managerTag!= null) {
+      fbFragmentManager = FbFragmentManager.getManager(managerTag)!!
       onCreateViewBefore()
-      contentWrapper = FbFrameLayout(context)
+      contentWrapper = FbFrameLayout(context!!)
       contentView = onCreateView(inflater, container)
     }
     return if (contentView != null) {
@@ -119,7 +101,7 @@ abstract class FbFragment : Fragment(), OnSwipeBackStateListener {
   }
 
   @CallSuper
-  override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     if (!isViewCreate) {
       onInit(savedInstanceState)
@@ -183,17 +165,17 @@ abstract class FbFragment : Fragment(), OnSwipeBackStateListener {
   override fun onScrollPercent(scrollPercent: Float) {
   }
 
-  fun switch(clazz: Class<out Fragment>, init: (FbActionEditor.() -> Unit)? = null) {
-    fbFragmentManager.switch(clazz, init)
+  fun switch(kclass: KClass<out Fragment>, init: (FbActionEditor.() -> Unit)? = null) {
+    fbFragmentManager.switch(kclass, init)
   }
 
-  fun add(clazz: Class<out Fragment>, init: (FbActionEditor.() -> Unit)? = null) {
-    fbFragmentManager.add(clazz, init)
+  fun add(kclass: KClass<out Fragment>, init: (FbActionEditor.() -> Unit)? = null) {
+    fbFragmentManager.add(kclass, init)
   }
 
-  fun addForResult(clazz: Class<out Fragment>, requestCode: Int,
+  fun addForResult(kclass: KClass<out Fragment>, requestCode: Int,
                    init: (FbActionEditor.() -> Unit)? = null) {
-    fbFragmentManager.addForResult(clazz, requestCode, init)
+    fbFragmentManager.addForResult(kclass, requestCode, init)
   }
 
   fun back() {

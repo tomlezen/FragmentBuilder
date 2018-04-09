@@ -4,12 +4,12 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion '26.0.2'
+    compileSdkVersion 27
+    buildToolsVersion '27.0.3'
     defaultConfig {
         applicationId "com.tlz.fragmentbuilder.example"
         minSdkVersion 15
-        targetSdkVersion 26
+        targetSdkVersion 27
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -28,21 +28,22 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    androidTestCompile ('com.android.support.test.espresso:espresso-core:2.2.2', {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    androidTestImplementation ('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile parent.ext.kotlin_jre
-    compile 'com.android.support:appcompat-v7:26.1.0'
-    testCompile 'junit:junit:4.12'
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    implementation parent.ext.kotlin_jre
+    //noinspection GradleCompatible
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+    testImplementation 'junit:junit:4.12'
+//    compile 'com.android.support.constraint:constraint-layout:1.0.2'
 //    compile 'com.github.Tomlezen:FragmentBuilder:0.0.1-pre7'
-    compile project(':lib')
+    implementation project(':lib')
 //    compile project(path: ':annotations')
 //    kapt project(':compiler')
-    debugCompile parent.ext.leakcanary
-    releaseCompile parent.ext.leakcanary_no_op
-    testCompile parent.ext.leakcanary_no_op
+    debugImplementation parent.ext.leakcanary
+    releaseImplementation parent.ext.leakcanary_no_op
+    testImplementation parent.ext.leakcanary_no_op
 }
 
 buildscript {

@@ -6,6 +6,8 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
+import android.support.annotation.ColorRes
+import android.support.annotation.DrawableRes
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewCompat
 import android.support.v4.widget.ViewDragHelper
@@ -20,14 +22,13 @@ import android.widget.FrameLayout
  * Date: 2017/7/13.
  * Time: 17:29.
  */
-class FbFrameLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout(context,
-    attrs) {
+class FbFrameLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout(context, attrs) {
 
   companion object {
     private const val DEFAULT_SCRIM_COLOR = 0x99000000.toInt()
     private const val FULL_ALPHA = 255
     private const val DEFAULT_SCROLL_THRESHOLD = 0.4f
-    private const val OVERSCROLL_DISTANCE = 10
+    private const val OVER_SCROLL_DISTANCE = 10
   }
 
   var scrollFinishThreshold = DEFAULT_SCROLL_THRESHOLD
@@ -73,7 +74,7 @@ class FbFrameLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
 
   override fun setBackgroundColor(color: Int) {}
 
-  override fun setBackgroundResource(resid: Int) {}
+  override fun setBackgroundResource(@DrawableRes resId: Int) {}
 
   override fun drawChild(canvas: Canvas, child: View, drawingTime: Long): Boolean {
     val drawChild = super.drawChild(canvas, child, drawingTime)
@@ -205,16 +206,16 @@ class FbFrameLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
       var top = 0
       when (curDragEdge) {
         FbSwipeMode.LEFT -> {
-          left = if (xvel >= 0f && scrollPercent > scrollFinishThreshold) childWidth + shadowLeft.intrinsicWidth + OVERSCROLL_DISTANCE else 0
+          left = if (xvel >= 0f && scrollPercent > scrollFinishThreshold) childWidth + shadowLeft.intrinsicWidth + OVER_SCROLL_DISTANCE else 0
         }
         FbSwipeMode.RIGHT -> {
-          left = -if (xvel <= 0f && scrollPercent > scrollFinishThreshold) childWidth + shadowRight.intrinsicWidth + OVERSCROLL_DISTANCE else 0
+          left = -if (xvel <= 0f && scrollPercent > scrollFinishThreshold) childWidth + shadowRight.intrinsicWidth + OVER_SCROLL_DISTANCE else 0
         }
         FbSwipeMode.TOP -> {
-          top = if (yvel >= 0f && scrollPercent > scrollFinishThreshold) childHeight + shadowTop.intrinsicHeight + OVERSCROLL_DISTANCE else 0
+          top = if (yvel >= 0f && scrollPercent > scrollFinishThreshold) childHeight + shadowTop.intrinsicHeight + OVER_SCROLL_DISTANCE else 0
         }
         FbSwipeMode.BOTTOM -> {
-          top = -if (yvel <= 0f && scrollPercent > scrollFinishThreshold) childHeight + shadowBottom.intrinsicHeight + OVERSCROLL_DISTANCE else 0
+          top = -if (yvel <= 0f && scrollPercent > scrollFinishThreshold) childHeight + shadowBottom.intrinsicHeight + OVER_SCROLL_DISTANCE else 0
         }
       }
 

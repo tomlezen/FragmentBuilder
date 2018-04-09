@@ -32,7 +32,7 @@ abstract class FbCompatActivity : AppCompatActivity() {
     FbFragmentManager.remove(this)
   }
 
-  protected abstract @IdRes
-  fun frameLayoutId(): Int
+  @IdRes
+  protected abstract fun frameLayoutId(): Int
 
 }

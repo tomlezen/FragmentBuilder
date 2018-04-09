@@ -70,7 +70,7 @@ abstract class FbToolbarFragment : FbFragment() {
       field = value
     }
 
-  private var statusbarPlaceholder: View? = null
+  private var statusBarPlaceholder: View? = null
 
   override final fun onCreateView(inflater: LayoutInflater, container: ViewGroup): View {
     if (!toolbarEnable && (!fitsSystemWindows || Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP || !windowTranslucentStatus())) {
@@ -79,10 +79,10 @@ abstract class FbToolbarFragment : FbFragment() {
       val ll = inflater.inflate(R.layout.fb_toolbar_layout, container, false) as LinearLayout
       ll.orientation = LinearLayout.VERTICAL
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && windowTranslucentStatus() && fitsSystemWindows) {
-        statusbarPlaceholder = View(context)
-        statusbarPlaceholder?.id = R.id.fb_statusbar
-        ll.addView(statusbarPlaceholder,
-            ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, statusbarHeight()))
+        statusBarPlaceholder = View(context)
+        statusBarPlaceholder?.id = R.id.fb_statusbar
+        ll.addView(statusBarPlaceholder,
+            ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, statusBarHeight()))
       }
       if (toolbarEnable) {
         toolbar = Toolbar(context)
@@ -143,16 +143,16 @@ abstract class FbToolbarFragment : FbFragment() {
     }
     ta.recycle()
 
-    if (statusbarPlaceholder == null) {
+    if (statusBarPlaceholder == null) {
       activity?.setWindowStatusBarColor(colorPrimaryDark)
     } else {
-      statusbarPlaceholder?.setBackgroundColor(colorPrimaryDark)
+      statusBarPlaceholder?.setBackgroundColor(colorPrimaryDark)
     }
   }
 
   override fun setUserVisibleHint(isVisibleToUser: Boolean) {
     super.setUserVisibleHint(isVisibleToUser)
-    if (isVisibleToUser && statusbarPlaceholder == null) {
+    if (isVisibleToUser && statusBarPlaceholder == null) {
       activity?.setWindowStatusBarColor(colorPrimaryDark)
     }
   }
@@ -171,7 +171,7 @@ abstract class FbToolbarFragment : FbFragment() {
     return value
   }
 
-  protected fun statusbarHeight(): Int {
+  protected fun statusBarHeight(): Int {
     return resources.getDimensionPixelSize(
         Resources.getSystem().getIdentifier("status_bar_height", "dimen", "android"))
   }
