@@ -6,7 +6,6 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
-import android.support.annotation.ColorRes
 import android.support.annotation.DrawableRes
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewCompat
@@ -45,16 +44,16 @@ class FbFrameLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
   private var scrimOpacity: Float = 0f
 
   private val shadowLeft: Drawable by lazy {
-    ContextCompat.getDrawable(context, R.mipmap.shadow_left)
+    ContextCompat.getDrawable(context, R.mipmap.shadow_left)!!
   }
   private val shadowRight: Drawable by lazy {
-    ContextCompat.getDrawable(context, R.mipmap.shadow_right)
+    ContextCompat.getDrawable(context, R.mipmap.shadow_right)!!
   }
   private val shadowTop: Drawable by lazy {
-    ContextCompat.getDrawable(context, R.mipmap.shadow_top)
+    ContextCompat.getDrawable(context, R.mipmap.shadow_top)!!
   }
   private val shadowBottom: Drawable by lazy {
-    ContextCompat.getDrawable(context, R.mipmap.shadow_bottom)
+    ContextCompat.getDrawable(context, R.mipmap.shadow_bottom)!!
   }
   private val drawnShadowRect = Rect()
 
@@ -196,7 +195,7 @@ class FbFrameLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
 
     override fun getViewHorizontalDragRange(child: View): Int = 1
 
-    override fun getViewVerticalDragRange(child: View?): Int = 1
+    override fun getViewVerticalDragRange(child: View): Int = 1
 
     override fun onViewReleased(releasedChild: View, xvel: Float, yvel: Float) {
       val childWidth = releasedChild.width

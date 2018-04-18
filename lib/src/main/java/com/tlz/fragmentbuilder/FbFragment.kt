@@ -35,8 +35,8 @@ abstract class FbFragment : Fragment(), OnSwipeBackStateListener {
   private var contentWrapper: FbFrameLayout? = null
   private var contentView: View? = null
 
-  private var isCreate = false
-  private var isViewCreate = false
+  private var isCreated = false
+  private var isViewCreated = false
   private var isLazyInit = false
   private var isSwipeFinish = false
   var isSwitch = false
@@ -51,6 +51,13 @@ abstract class FbFragment : Fragment(), OnSwipeBackStateListener {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     requestCode = arguments?.getInt(FbConst.KEY_FB_REQUEST_CODE) ?: 0
+  }
+
+  override fun setArguments(args: Bundle?) {
+    super.setArguments(args)
+    arguments?.getString(FbConst.KEY_FRAGMENT_MANAGER_TAG)?.let {
+      fbFragmentManager = FbFragmentManager.getManager(it)!!
+    }
   }
 
   override final fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation? {
@@ -80,15 +87,13 @@ abstract class FbFragment : Fragment(), OnSwipeBackStateListener {
 
   override final fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
     rootView = container
-    val managerTag = arguments?.getString(FbConst.KEY_FRAGMENT_MANAGER_TAG)
-    if (contentView == null && container != null && managerTag!= null) {
-      fbFragmentManager = FbFragmentManager.getManager(managerTag)!!
+    if (contentView == null && container != null) {
       onCreateViewBefore()
-      contentWrapper = FbFrameLayout(context!!)
+      contentWrapper = FbFrameLayout(activity!!)
       contentView = onCreateView(inflater, container)
     }
     return if (contentView != null) {
-      isCreate = true
+      isCreated = true
       val parentView = contentView?.parent as? ViewGroup
       parentView?.removeView(contentView)
       contentWrapper?.addView(contentView,
@@ -103,16 +108,16 @@ abstract class FbFragment : Fragment(), OnSwipeBackStateListener {
   @CallSuper
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    if (!isViewCreate) {
+    if (!isViewCreated) {
       onInit(savedInstanceState)
     }
-    isViewCreate = true
+    isViewCreated = true
   }
 
   @CallSuper
   override fun setUserVisibleHint(isVisibleToUser: Boolean) {
     super.setUserVisibleHint(isVisibleToUser)
-    if (isVisibleToUser && isCreate) {
+    if (isVisibleToUser && isCreated) {
       prepareLazyInit()
     }
   }
@@ -122,7 +127,9 @@ abstract class FbFragment : Fragment(), OnSwipeBackStateListener {
     super.onResume()
     if (userVisibleHint && !isLazyInit) {
       onFbResume()
-      prepareLazyInit()
+      if (isCreated) {
+        prepareLazyInit()
+      }
     }
   }
 
@@ -144,7 +151,7 @@ abstract class FbFragment : Fragment(), OnSwipeBackStateListener {
 
   private fun prepareLazyInit() {
     onLazyInit()
-    isCreate = false
+    isCreated = false
     isLazyInit = true
   }
 
@@ -156,7 +163,10 @@ abstract class FbFragment : Fragment(), OnSwipeBackStateListener {
 
   open fun onBackPress(): Boolean {
     if (fbFragmentManager.canBack()) {
-      back()
+      // 如果还未完成初始化，不进行返回操作
+      if (isLazyInit) {
+        back()
+      }
       return true
     }
     return false

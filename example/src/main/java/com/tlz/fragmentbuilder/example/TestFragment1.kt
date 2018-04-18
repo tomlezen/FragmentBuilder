@@ -1,23 +1,16 @@
 package com.tlz.fragmentbuilder.example
 
 import android.graphics.Color
-import android.graphics.Rect
 import android.os.Bundle
 import android.util.Log
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.Animation
-import android.view.animation.AnimationUtils
 import android.widget.Toast
 import com.tlz.fragmentbuilder.FbSwipeMode
 import com.tlz.fragmentbuilder.FbToolbarFragment
-import com.transitionseverywhere.Slide
-import com.transitionseverywhere.Transition
-import kotlinx.android.synthetic.main.fragment_test1.content1
-import kotlinx.android.synthetic.main.fragment_test1.tv_test
-import java.util.Random
+import kotlinx.android.synthetic.main.fragment_test1.*
+import java.util.*
 
 /**
  *
@@ -67,7 +60,7 @@ class TestFragment1 : FbToolbarFragment() {
     (activity as MainActivity).refWatcher.watch(this)
   }
 
-  override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     content1.setBackgroundColor(Color.rgb(Random().nextInt(255), Random().nextInt(255), Random().nextInt(255)))
     tv_test.setOnClickListener {

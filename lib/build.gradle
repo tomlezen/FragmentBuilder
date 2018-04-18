@@ -28,22 +28,22 @@ android {
     }
 }
 
-configurations.all {
-    resolutionStrategy.eachDependency { DependencyResolveDetails details ->
-        def requested = details.requested
-        if (requested.group == 'com.android.support') {
-            if (!requested.name.startsWith("support-v4")) {
-                details.useVersion '27.1.1'
-            }
-        }
-    }
-}
+//configurations.all {
+//    resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+//        def requested = details.requested
+//        if (requested.group == 'com.android.support') {
+//            if (!requested.name.startsWith("support-v4")) {
+//                details.useVersion '27.1.1'
+//            }
+//        }
+//    }
+//}
 
 
 dependencies {
     implementation parent.ext.support_v7
     implementation parent.ext.kotlin_jre
-    api "com.andkulikov:transitionseverywhere:1.7.5"
+//    api "com.andkulikov:transitionseverywhere:1.7.5"
     testImplementation 'junit:junit:4.12'
 }
 

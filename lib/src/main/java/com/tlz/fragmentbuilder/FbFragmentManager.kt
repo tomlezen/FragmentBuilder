@@ -193,7 +193,7 @@ class FbFragmentManager private constructor(
     }
 
     fun with(fragment: Fragment, @IdRes frameLayoutId: Int): FbFragmentManager =
-        with(fragment.context, fragment.javaClass.canonicalName, fragment.childFragmentManager, frameLayoutId)
+        with(fragment.activity!!, fragment.javaClass.canonicalName, fragment.childFragmentManager, frameLayoutId)
 
     private fun with(context: Context, TAG: String,
                      fragmentManager: FragmentManager, @IdRes frameLayoutId: Int): FbFragmentManager {

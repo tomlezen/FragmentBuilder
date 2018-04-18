@@ -32,7 +32,7 @@ abstract class FbToolbarFragment : FbFragment() {
 
   protected var themeResId = 0
     get() {
-      return if (context == null || field != 0) {
+      return if (activity == null || field != 0) {
         field
       } else {
         activity?.let {
@@ -173,15 +173,15 @@ abstract class FbToolbarFragment : FbFragment() {
   }
 
   protected fun statusBarHeight(): Int =
-     resources.getDimensionPixelSize(Resources.getSystem().getIdentifier("status_bar_height", "dimen", "android"))
+      resources.getDimensionPixelSize(Resources.getSystem().getIdentifier("status_bar_height", "dimen", "android"))
 
   protected fun toolbarHeight(): Int =
-    context?.let {
-      val ta = context!!.obtainStyledAttributes(intArrayOf(android.R.attr.actionBarSize))
-      val value = ta.getDimensionPixelSize(ta.getIndex(0), 0)
-      ta.recycle()
-      value
-    } ?: 0
+      activity?.let {
+        val ta = context!!.obtainStyledAttributes(intArrayOf(android.R.attr.actionBarSize))
+        val value = ta.getDimensionPixelSize(ta.getIndex(0), 0)
+        ta.recycle()
+        value
+      } ?: 0
 
   protected open fun onNavigationOnClick() {
     onBackPress()

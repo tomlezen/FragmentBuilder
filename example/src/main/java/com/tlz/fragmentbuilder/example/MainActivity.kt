@@ -1,17 +1,9 @@
 package com.tlz.fragmentbuilder.example
 
 import android.os.Bundle
-import android.view.Gravity
 import com.squareup.leakcanary.LeakCanary
 import com.squareup.leakcanary.RefWatcher
 import com.tlz.fragmentbuilder.FbCompatActivity
-import com.tlz.fragmentbuilder.FbFragmentManager
-import com.tlz.fragmentbuilder.animation.FbAnimationSet
-import com.tlz.fragmentbuilder.endWithAction
-import com.transitionseverywhere.Slide
-import com.transitionseverywhere.TransitionManager
-import com.transitionseverywhere.TransitionSet
-import kotlinx.android.synthetic.main.activity_main.main_content
 
 class MainActivity : FbCompatActivity() {
 
